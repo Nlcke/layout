@@ -1624,7 +1624,7 @@ function Layout.loadFromPath(p)
 		local filename  = prefix .. name
 		local e = (name:match "^.+(%..+)$" or ""):lower()
 		i = i + 1
-		local filenamemod = nil
+		local filenamemod = true
 		if namemod then
 			local base = name:sub(1, -#e - 1)
 			filenamemod = namemod(filename, prefix, base, e, k + 1)
