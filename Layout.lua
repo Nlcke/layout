@@ -22,16 +22,12 @@ Layout:forSomeChild(filter, func, [p1, p2, p3, p4, p5, p6, p7, p8])
 	-- apply function with optional parameters to class filtered children
 	-- filter is the string with class names divided by any symbols
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TextField ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-TextField was patched to enable optional top anchoring
-which used by all other sprites so your text can be positioned nicely.
-Top anchoring can be enabled through 'sample' parameter:
-	◘ TextField.new(font, text, sample)
-	◘ TextField:setText(text, sample)
-where 'sample' parameter can be the following:
-	◘ nil   : previous TextField behaviour
-	◘ true  : Textfield anchored to the highest character of 'text'
-	◘ string: Textfield anchored to the highest character of 'sample'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TextLine ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TextLine is same as TextField but with top anchoring which
+used by all other Gideros sprites so the text will be positioned nicely.
+Top anchoring will be calculated through sample or text if sample is nil:
+	◘ TextLine.new(font, text, sample)
+	◘ TextLine:setText(text, sample)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Animation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 to describe animation a table with the following keys must be used:
