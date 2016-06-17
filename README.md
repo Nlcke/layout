@@ -13,7 +13,7 @@ Layout is GUI framework for Gideros game engine.
 * Template grids
 * Kinetic scrolling and moving
 * Move/Scale/Rotate for images' preview
-* TextLine class as TextField replacement
-* and many more!
+* TextArea class as TextField replacement
+* Resource loader
 
 Currently documentation can be found inside library itself (`Layout.lua`).
