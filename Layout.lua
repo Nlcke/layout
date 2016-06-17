@@ -22,12 +22,48 @@ Layout:forSomeChild(filter, func, [p1, p2, p3, p4, p5, p6, p7, p8])
 	-- apply function with optional parameters to class filtered children
 	-- filter is the string with class names divided by any symbols
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TextLine ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-TextLine is same as TextField but with top anchoring which
-used by all other Gideros sprites so the text will be positioned nicely.
-Top anchoring will be calculated through sample or text if sample is nil:
-	◘ TextLine.new(font, text, sample)
-	◘ TextLine:setText(text, sample)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TextArea ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TextArea class is superpowered version of TextField.
+TextArea has normal anchoring as opposed to TextField and supports multiline
+text with different alignment modes and first-line indentation.
+TextArea can be created with:
+TextArea.new(font, text, sample, align, width, letterspace, linespace)
+where
+	font        = TTFont | Font
+	text        = string
+	sample      = string | nil
+	align       = "L" | "C" | "R" | "J" | nil
+	width       = number | nil
+	letterspace = number | nil
+	linespace   = number | nil
+TextArea has following setters and getters:
+	setText          - getText
+	setSample        - getSample
+	setAlignment     - getAlignment
+	setLetterSpacing - getLetterSpacing
+	setLineSpacing   - getLineSpacing
+	setTextColor     - getTextColor
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Resource Loader ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Layout has optional resource loader	to automatically load various resources.
+From the box it supports .jpg, .png, .wav, .mp3, .ttf, .otf, .lua, .json.
+Resource Loader returs a table with resources, their names and indexes where
+resources can be accessed with t[integer_number] or t[resource_name] and
+resource name can be received with negative index i.e. t[-integer_number].
+It has following interface:
+Layout.loadFromPath{...} where {...} is a table with following parameters:
+	path    = string  -- path to directory with resources
+	subdirs = boolean -- load resources from subdirectories
+	names   = string  -- table of names to filter directory files
+	from    = number  -- index of first resource file to load
+	to      = number  -- index of last resource file to load
+	output  = boolean -- print list of resource files
+	namemod = function(name, path, base, ext, i) -- to filter file names
+	textureFiltering = boolean
+	textureOptions   = table
+	fontSize         = number
+	fontText         = text
+	fontFiltering    = boolean
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Animation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 to describe animation a table with the following keys must be used:
@@ -438,8 +474,9 @@ function Layout:enterFrame(e)
 				if self == Layout.selected then
 					Layout.select(self.__parent)
 				end
+				self.parent = nil
 				Sprite.removeFromParent(self)
-				update = false
+				return
 			elseif self.event == Layout.HOVER then
 				if self.onHover then self:onHover() end
 			elseif self.event == Layout.PLAY then
@@ -526,11 +563,15 @@ end
 
 function Layout:removeFromParent()
 	if self.anRemove then
-		self.event = self.REMOVE
+		self.event = Layout.REMOVE
 		self:disableEvents()
 		self:play(self.anRemove, nil, -1)
 	else
 		if self.onRemove then self:onRemove() end
+		if self == Layout.selected then
+			Layout.select(self.__parent)
+		end
+		self.parent = nil
 		Sprite.removeFromParent(self)
 	end
 end
@@ -1498,8 +1539,8 @@ function Layout.onKeyOrButton(code)
 		local yMin, yMax = -math.huge, math.huge
 		if code == "RIGHT" then
 			table.foreach(parent.__children, function(_, child)
-				local x = child.x or child:getX()
-				local y = child.y or child:getY()
+				local x = child.isLayout and child.x or child:getX()
+				local y = child.isLayout and child.y or child:getY()
 				local dy = math.abs(y - y0)
 				if x > x0 and x <= xMax and dy <= yMax then
 					selected, xMax, yMax = child, x, dy
@@ -1508,8 +1549,8 @@ function Layout.onKeyOrButton(code)
 			actions.RIGHT = nil
 		elseif code == "LEFT" then
 			table.foreach(parent.__children, function(_, child)
-				local x = child.x or child:getX()
-				local y = child.y or child:getY()
+				local x = child.isLayout and child.x or child:getX()
+				local y = child.isLayout and child.y or child:getY()
 				local dy = math.abs(y - y0)
 				if x < x0 and x >= xMin and dy <= yMax then
 					selected, xMin, yMax = child, x, dy
@@ -1518,8 +1559,8 @@ function Layout.onKeyOrButton(code)
 			actions.LEFT = nil
 		elseif code == "DOWN" then
 			table.foreach(parent.__children, function(_, child)
-				local x = child.x or child:getX()
-				local y = child.y or child:getY()
+				local x = child.isLayout and child.x or child:getX()
+				local y = child.isLayout and child.y or child:getY()
 				local dx = math.abs(x - x0)
 				if y > y0 and y <= yMax and dx <= xMax then
 					selected, yMax, xMax = child, y, dx
@@ -1528,8 +1569,8 @@ function Layout.onKeyOrButton(code)
 			actions.DOWN = nil
 		elseif code == "UP" then
 			table.foreach(parent.__children, function(_, child)
-				local x = child.x or child:getX()
-				local y = child.y or child:getY()
+				local x = child.isLayout and child.x or child:getX()
+				local y = child.isLayout and child.y or child:getY()
 				local dx = math.abs(x - x0)
 				if y < y0 and y >= yMin and dx <= xMax then
 					selected, yMin, xMax = child, y, dx
@@ -1568,16 +1609,16 @@ function Layout.onKeyOrButton(code)
 	end
 end
 
--- EXTRAS --
+-- RESOURCE LOADER --
 
 function Layout.loadFromPath(p)
-	local path = p.path       -- string
-	local subdirs = p.subdirs -- boolean
-	local names = p.names     -- string
-	local from = p.from or 1  -- number
-	local to = p.to or 1e15   -- number
-	local namemod = p.namemod -- function(name, path, base, ext, i)
-	local output = p.output   -- boolean
+	local path = p.path
+	local subdirs = p.subdirs
+	local names = p.names
+	local from = p.from or 1
+	local to = p.to or 1e15
+	local namemod = p.namemod
+	local output = p.output
 	
 	local textureFiltering = p.textureFiltering
 	local textureOptions = p.textureOptions
@@ -1695,154 +1736,229 @@ function Layout:forSomeChild(filter, func, p1, p2, p3, p4, p5, p6, p7, p8)
 	end
 end
 
--- ONELINE TEXT
-
-TextLine = Core.class(TextField)
-
-TextLine.defaultFont = Font.getDefault()
-
-function TextLine:init(font, text, sample)
-	self.font = font or TextLine.defaultFont
-	self.sample = sample or text
-	local x, y, w, h = self.font:getBounds(self.sample)
-	if self.sample ~= text then
-		local _
-		x, _, w, _ = self.font:getBounds(text)
-	end
-	Sprite.setAnchorPosition(self, x, y)
-	self.x, self.y, self.w, self.h = x, y, w, h
-end
-
-function TextLine:setText(text, sample)
-	self.sample = sample or self.sample or text
-	local x, y, w, h = self.font:getBounds(self.sample)
-	if self.sample ~= self.text then
-		local _
-		x, _, w, _ = self.font:getBounds(text)
-	end
-	local ax, ay = Sprite.getAnchorPosition(self)
-	Sprite.setAnchorPosition(self, self.x - x + ax, self.y - y + ay)
-	TextField.setText(self, text)
-	self.x, self.y, self.w, self.h = x, y, w, h
-end
-
-function TextLine:setAnchorPosition(x, y)
-	return Sprite.setAnchorPosition(self, self.x + x, self.y + y)
-end
-
-function TextLine:getAnchorPosition()
-	local x, y = Sprite.getAnchorPosition(self)
-	return x - self.x, y - self.y
-end
-
-function TextLine:set(key, value)
-	if key == "anchorX" then
-		return Sprite.set(self, key, self.x + value)
-	elseif key == "anchorY" then
-		return Sprite.set(self, key, self.y + value)
-	else
-		return Sprite.set(self, key, value)
-	end
-end
-
-function TextLine:get(key)
-	if key == "anchorX" then
-		return Sprite.get(self, "anchorX") - self.x
-	elseif key == "anchorY" then
-		return Sprite.get(self, "anchorY") - self.y
-	else
-		return Sprite.get(self, key)
-	end
-end
-
-function TextLine:getWidth()
-	return self:getScaleX() * self.w
-end
-
-function TextLine:getHeight()
-	return self:getScaleY() * self.h
-end
-
--- MULTILINE TEXT
+-- TEXTAREA
 
 TextArea = Core.class(Sprite)
 
-local function toUTF8chars(s)
-	local t = {[0] = 0}
-	local i, acc = 0, 1
-	for char in s:gmatch"[%z\001-\127\194-\244][\128-\191]*" do
-		table.insert(t, char)
-		i = i - 1
-		t[i] = acc
-		acc = acc + #char
-	end
-	t[0] = s
-	return t
-end
+TextArea.defaultFont = Font.getDefault()
 
-local function utf8sub(t, p1, p2)
-	local l = #t
-	if p1 < 0 then p1 = l + p1 + 1 end
-	if p2 then
-		if p2 < 0 then p2 = l + p2 + 1 end
-		if p2 >= l then p2 = nil end
-	end
-	return t[0]:sub(t[-p1] or 1, p2 and t[-1-p2] - 1)
-end
-
-local function getLines(chars, width, font)
-	local t = {}
-	local len = #chars
-	local min, max = 1, len
-	local off = 1
-	local pos = max
-	while off < len do
-		local s = utf8sub(chars, off , off + pos)
-		local _, _, w = font:getBounds(s)
-		if w < width then min = pos else max = pos end
-		if max - min < 2 then
-			if max ~= pos or max == min then
-				t[#t+1] = s
-				off = off + pos + 1
-				min, max = 1, len - off + 1
-				pos = max
-			else
-				pos = pos - 1
-			end
-		else
-			pos = math.floor(0.5 * (min + max))
+function TextArea:init(font, text, sample,
+align, width, letterspace, linespace)
+	font = font or TextArea.defaultFont
+	sample = sample or text
+	local x, y, w, h = font:getBounds(sample)
+	
+	if not align then
+		local child = TextField.new(font, text)
+		self:addChild(child)
+		if sample ~= text then
+			local _
+			x, _, w, _ = font:getBounds(text)
 		end
+		child:setPosition(-x, -y)
+		
+		self.font = font
+		self.text = text
+		self.sample = sample
+		self.offsetY = y
+		self.heightmul = h / Sprite.getHeight(self)
+		return
 	end
-	return t
-end
-
-function TextArea:init(font, text, sample, width, height, lineheight)
-	self.text = text
+	
+	local lines = {}
+	
+	if width then
+		local words = {}
+		local p1, p2 = sample:find"[ ]+"
+		local indent = p2 and (" "):rep(p2 - p1 + 1)
+		local text = text:gsub("\n", " \n ")
+		for word in text:gmatch"([^ ]+)" do table.insert(words, word) end
+		local line0 = indent
+		for i, word in ipairs(words) do
+			local newline = word == "\n"
+			if newline then
+				if words[i-1] == "\n" then
+					table.insert(lines, "")
+				elseif line0 then
+					table.insert(lines, line0)
+					line0 = indent
+				end
+			else
+				local line = line0 and line0 .. " " .. word or word
+				local _, _, lw, _ = font:getBounds(line)
+				if lw > width then
+					table.insert(lines, line0 or line)
+					line0 = line0 and word
+				else
+					line0 = line
+				end
+			end
+		end
+		table.insert(lines, line0)
+	else
+		for line in text:gmatch"[^\r\n]+" do table.insert(lines, line) end
+	end
+	
+	local t, xs, ws = {}, {}, {}
+	local w = 0
+	local widest = 0
+	local l = #lines
+	
+	for k,line in ipairs(lines) do
+		local lx, _, lw, _ = font:getBounds(line)
+		if lw > w then w = lw; widest = k end
+		t[k], xs[k], ws[k] = TextField.new(font, line), lx, lw
+	end
+	
+	if letterspace then
+		for i = 1, l do
+			t[i]:setLetterSpacing(letterspace)
+			ws[i] = t[i]:getWidth()
+		end
+		w = ws[widest]
+	end
+	
+	if align == "R" then
+		for i = 1, l do t[i]:setX(w - ws[i] - xs[i]) end
+	elseif align == "C" then
+		for i = 1, l do t[i]:setX(0.5 * (w - ws[i]) - xs[i]) end
+	elseif align == "J" then
+		local nls = (letterspace or 0) + 1
+		for i = 1, l - 1 do
+			local nextline = lines[i+1]
+			if nextline ~= "" and nextline:sub(1,1) ~= " " then
+				local child = t[i]
+				local w0 = ws[i]
+				child:setLetterSpacing(nls)
+				local w1 = child:getWidth()
+				local s = math.floor((w - w0) / (w1 - w0))
+				child:setLetterSpacing(s)
+			end
+		end
+	else
+		for i = 1, l do t[i]:setX(-xs[i]) end
+	end
+	
+	linespace = linespace or 0
+	local h = h + linespace
+	for i = 1, l do
+		t[i]:setY((i - 1) * h - y)
+		self:addChild(t[i])
+	end
+	
 	self.font = font
+	self.text = text
 	self.sample = sample
-	self.width = width
-	self.height = height
-	self.lineheight = lineheight
-	
-	self.utf8chars = toUTF8chars(self.text)
-	
-	local lines = getLines(self.utf8chars, self.width, self.font)
-	
-	local x0, y0 = Sprite.getAnchorPosition(self)
-	local x, y = self.font:getBounds(self.sample)
-	self:setAnchorPosition(x0 + x, y0 + y)
-	
-	for k, line in ipairs(lines) do
-		local textfield = TextField.new(self.font, line)
-		self:addChild(textfield)
-		textfield:setY(k * lineheight - lineheight)
+	self.align = align
+	self.letterspace = letterspace or 0
+	self.linespace = linespace or 0
+	self.heightmul =  (l * h - linespace) / Sprite.getHeight(self)
+	self.textcolor = 0x000000
+	self.width = w
+	self.lineheight = h - linespace
+	self.offsetY = y
+	self.widest = widest
+end
+
+function TextArea:setText(text)
+	self.text = text
+	if self.align then
+		error "UNIMPLEMENTED"
+	else
+		local _, child = next(self.__children)
+		local h0 = Sprite.getHeight(self)
+		child:setText(text)
+		self.heightmul = self.heightmul * h0 / Sprite.getHeight(self)
 	end
 end
 
-function TextArea:setText(text, sample)
-	
+function TextArea:getText(color)
+	return self.text
 end
 
-function TextArea:setSize(width, height)
+function TextArea:setLetterSpacing(letterspace)
+	self.letterspace = letterspace
+	if not self.align then
+		local _, child = next(self.__children)
+		child:setLetterSpacing(letterspace)
+	elseif self.__children then
+		local child = self:getChildAt(self.widest)
+		child:setLetterSpacing(letterspace)
+		self.width = child:getWidth()
+		local w = self.width
+		table.foreach(self.__children, function(_, child)
+			child:setLetterSpacing(letterspace)
+		end)
+		if self.align == "R" then
+			table.foreach(self.__children, function(_, child)
+				child:setX(w - child:getWidth())
+			end)
+		elseif self.align == "C" then
+			table.foreach(self.__children, function(_, child)
+				child:setX(0.5 * (w - child:getWidth()))
+			end)
+		elseif self.align == "J" then
+			local nls = (letterspace or 0) + 1
+			local l = self:getNumChildren()
+			for i = 1, l - 1 do
+				local nextline = self:getChildAt(i+1):getText()
+				if nextline ~= "" and nextline:sub(1,1) ~= " " then
+					local child = self:getChildAt(i)
+					local w0 = child:getWidth()
+					child:setLetterSpacing(nls)
+					local w1 = child:getWidth()
+					local s = math.floor((w - w0) / (w1 - w0))
+					child:setLetterSpacing(s)
+				end
+			end
+		end
+	end	
+end
 
+function TextArea:getLetterSpacing(color)
+	return self.letterspace
+end
+
+function TextArea:setLineSpacing(linespace)
+	self.linespace = linespace
+	if not self.__children then return end
+	local h = self.lineheight + linespace
+	local y = self.offsetY
+	local l = self:getNumChildren()
+	for i = 1, l do
+		local child = self:getChildAt(i)
+		child:setY((i - 1) * h - y)
+	end
+	self.heightmul = (l * h - linespace) / Sprite.getHeight(self)
+end
+
+function TextArea:getLineSpacing()
+	return self.linespace
+end
+
+function TextArea:setAlignment(align)
+	local align0 = self.align
+	self.align = align
+	error "UNIMPLEMENTED"
+end
+
+function TextArea:getAlignment()
+	return self.align
+end
+
+function TextArea:setTextColor(color)
+	self.textcolor = color
+	if self.__children then
+		table.foreach(self.__children, function(_, child)
+			child:setTextColor(color)
+		end)
+	end
+end
+
+function TextArea:getTextColor()
+	return self.textcolor
+end
+
+function TextArea:getHeight()
+	return self.heightmul * Sprite.getHeight(self)
 end
