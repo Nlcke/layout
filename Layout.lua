@@ -1799,7 +1799,7 @@ align, width, letterspace, linespace)
 		for line in text:gmatch"[^\r\n]+" do table.insert(lines, line) end
 	end
 	
-	local t, xs, ws = {}, {}, {}
+	local t, xs, xs0, ws = {}, {}, {}, {}
 	local w = 0
 	local widest = 0
 	local l = #lines
@@ -1807,7 +1807,7 @@ align, width, letterspace, linespace)
 	for k,line in ipairs(lines) do
 		local lx, _, lw, _ = font:getBounds(line)
 		if lw > w then w = lw; widest = k end
-		t[k], xs[k], ws[k] = TextField.new(font, line), lx, lw
+		t[k], xs[k], ws[k], xs0[k] = TextField.new(font, line), lx, lw, 0
 	end
 	
 	if letterspace then
@@ -1819,9 +1819,9 @@ align, width, letterspace, linespace)
 	end
 	
 	if align == "R" then
-		for i = 1, l do t[i]:setX(w - ws[i] - xs[i]) end
+		for i = 1, l do xs0[i] = w - ws[i] end
 	elseif align == "C" then
-		for i = 1, l do t[i]:setX(0.5 * (w - ws[i]) - xs[i]) end
+		for i = 1, l do xs0[i] = 0.5 * (w - ws[i]) end
 	elseif align == "J" then
 		local nls = (letterspace or 0) + 1
 		for i = 1, l - 1 do
@@ -1835,14 +1835,12 @@ align, width, letterspace, linespace)
 				child:setLetterSpacing(s)
 			end
 		end
-	else
-		for i = 1, l do t[i]:setX(-xs[i]) end
 	end
 	
 	linespace = linespace or 0
 	local h = h + linespace
 	for i = 1, l do
-		t[i]:setY((i - 1) * h - y)
+		t[i]:setPosition(xs0[i] - xs[i], (i - 1) * h - y)
 		self:addChild(t[i])
 	end
 	
@@ -1858,12 +1856,20 @@ align, width, letterspace, linespace)
 	self.lineheight = h - linespace
 	self.offsetY = y
 	self.widest = widest
+	self.offsetXs = xs
 end
 
 function TextArea:setText(text)
 	self.text = text
 	if self.align then
-		error "UNIMPLEMENTED"
+		local _, child = next(self.__children)
+		local textColor = child and child:getTextColor() or 0x000000
+		table.foreach(self.__children, function(_, child)
+			child:removeFromParent()
+		end)
+		self:init(self.font, self.text, self.sample, self.align, self.width,
+			self.letterspace, self.linespace)
+		if textColor ~= 0x000000 then self:setTextColor(textColor) end
 	else
 		local _, child = next(self.__children)
 		local h0 = Sprite.getHeight(self)
@@ -1876,6 +1882,24 @@ function TextArea:getText(color)
 	return self.text
 end
 
+function TextArea:setSample(sample)
+	self.sample = sample or self.text
+	local x, y, w, h = self.font:getBounds(self.sample)
+	if self.align then
+		self.offsetY, self.lineheight = y, h
+		self:setLineSpacing(self.linespace)
+	else
+		local _, child = next(self.__children)
+		child:setY(-y)
+		self.offsetY = y
+		self.heightmul = h / Sprite.getHeight(self)
+	end
+end
+
+function TextArea:getSample()
+	return self.sample
+end
+
 function TextArea:setLetterSpacing(letterspace)
 	self.letterspace = letterspace
 	if not self.align then
@@ -1886,25 +1910,27 @@ function TextArea:setLetterSpacing(letterspace)
 		child:setLetterSpacing(letterspace)
 		self.width = child:getWidth()
 		local w = self.width
+		local align = self.align
+		
+		local t, xs, ws, xs0 = {}, self.offsetXs, {}, {}
 		table.foreach(self.__children, function(_, child)
 			child:setLetterSpacing(letterspace)
+			local i = self:getChildIndex(child)
+			t[i], ws[i], xs0[i] = child, child:getWidth(), 0
 		end)
-		if self.align == "R" then
-			table.foreach(self.__children, function(_, child)
-				child:setX(w - child:getWidth())
-			end)
-		elseif self.align == "C" then
-			table.foreach(self.__children, function(_, child)
-				child:setX(0.5 * (w - child:getWidth()))
-			end)
-		elseif self.align == "J" then
+		local l = #t
+		
+		if align == "R" then
+			for i = 1, l do xs0[i] = w - ws[i] end
+		elseif align == "C" then
+			for i = 1, l do xs0[i] = 0.5 * (w - ws[i]) end
+		elseif align == "J" then
 			local nls = (letterspace or 0) + 1
-			local l = self:getNumChildren()
 			for i = 1, l - 1 do
-				local nextline = self:getChildAt(i+1):getText()
+				local nextline = t[i+1]:getText()
 				if nextline ~= "" and nextline:sub(1,1) ~= " " then
-					local child = self:getChildAt(i)
-					local w0 = child:getWidth()
+					local child = t[i]
+					local w0 = ws[i]
 					child:setLetterSpacing(nls)
 					local w1 = child:getWidth()
 					local s = math.floor((w - w0) / (w1 - w0))
@@ -1912,6 +1938,8 @@ function TextArea:setLetterSpacing(letterspace)
 				end
 			end
 		end
+		
+		for i = 1, l do t[i]:setX(xs0[i] - xs[i]) end
 	end	
 end
 
@@ -1937,9 +1965,8 @@ function TextArea:getLineSpacing()
 end
 
 function TextArea:setAlignment(align)
-	local align0 = self.align
 	self.align = align
-	error "UNIMPLEMENTED"
+	self:setLetterSpacing(self.letterspace)
 end
 
 function TextArea:getAlignment()
