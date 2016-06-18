@@ -1,5 +1,5 @@
 <project>
- <properties logicalHeight="480" fps="60" winrt_package="com.yourdomain.yourapp" ios_bundle="com.yourdomain." osx_bundle="com.yourdomain." orientation="0" app_icon_noexport="0" assetsOnly="0" encryptCode="0" html5_host="" winrt_org="GiderosMobile" retinaDisplay="0" windowWidth="0" osx_domain="giderosmobile.com" scaleMode="0" version="1.0" encryptAssets="0" app_icon="" mouseToTouch="0" iosDevice="0" win_domain="giderosmobile.com" windowHeight="0" android_template="0" version_code="1" packageName="com.yourdomain.yourapp" osx_category="5" html5_mem="256" logicalWidth="320" win_org="GiderosMobile" mouseTouchOrder="0" touchToMouse="0" autorotation="0" architecture="6" osx_org="GiderosMobile">
+ <properties autorotation="0" logicalWidth="320" osx_org="GiderosMobile" logicalHeight="480" osx_category="5" android_template="0" win_org="GiderosMobile" version_code="1" winrt_org="GiderosMobile" winrt_package="com.yourdomain.yourapp" orientation="0" windowWidth="0" iosDevice="0" windowHeight="0" mouseToTouch="0" retinaDisplay="0" osx_bundle="com.yourdomain." app_icon_noexport="0" architecture="6" assetsOnly="0" osx_domain="giderosmobile.com" version="1.0" html5_host="" html5_mem="256" mouseTouchOrder="0" encryptCode="0" encryptAssets="0" scaleMode="0" fps="60" win_domain="giderosmobile.com" touchToMouse="0" ios_bundle="com.yourdomain." packageName="com.yourdomain.yourapp" app_icon="">
   <imageScales/>
   <plugins/>
   <exports>
@@ -23,9 +23,10 @@
  </folder>
  <file source="main.lua"/>
  <folder name="examples">
-  <file source="examples/template_grid.lua" excludeFromExecution="1"/>
-  <file source="examples/multiline_text.lua" excludeFromExecution="1"/>
-  <file source="examples/positioning.lua" excludeFromExecution="1"/>
+  <file excludeFromExecution="1" source="examples/sizing.lua"/>
+  <file excludeFromExecution="1" source="examples/template_grid.lua"/>
+  <file excludeFromExecution="1" source="examples/multiline_text.lua"/>
+  <file excludeFromExecution="1" source="examples/positioning.lua"/>
  </folder>
  <file source="Layout.lua"/>
 </project>

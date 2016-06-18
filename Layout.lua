@@ -267,6 +267,8 @@ local default = {
 	onHover  = false, -- callback at mouse hovering, [false|function]
 	onPress  = false, -- callback at LMB or touch press, [false|function]
 	onHold   = false, -- callback at LMB or touch while hold, [false|function]
+	onMove   = false, -- callback at layout moving
+	onScroll = false, -- callback at layout scrolling
 	
 	-- built-in callbacks
 	scroll = false, -- move children with mouse or touch, [false|true]
@@ -900,6 +902,7 @@ end
 function Layout:updateScroll(dx, dy)
 	if dx == 0 and dy == 0 then return end
 	local offX, offY = self.offX - dx, self.offY - dy
+	
 	if offX < 0 then
 		dx = self.offX
 		offX = 0
@@ -909,6 +912,7 @@ function Layout:updateScroll(dx, dy)
 		offX = self.scrW
 		self.pointerAX = 0
 	end
+	
 	if offY < 0 then
 		dy = self.offY
 		offY = 0
@@ -918,15 +922,18 @@ function Layout:updateScroll(dx, dy)
 		offY = self.scrH
 		self.pointerAY = 0
 	end
+	
 	self:setClip(offX, offY, self.w, self.h)
 	local x, y = self:getPosition()
 	self:setPosition(x + dx, y + dy)
 	self.backup.x = self.backup.x + (dx / self.w)
 	self.backup.y = self.backup.y + (dy / self.h)
+	
 	if Layout.selected == self then
 		Layout.selector:setPosition(offX, offY)
 	end
 	self.offX, self.offY = offX, offY
+	
 	if self.template then
 		if self.__children then
 			table.foreach(self.__children, function(_, child)
@@ -937,6 +944,8 @@ function Layout:updateScroll(dx, dy)
 		end
 		self:updateTemplateGrid()
 	end
+	
+	if self.onScroll then self:onScroll() end
 end
 
 function Layout:updateMove(dx, dy)
@@ -967,6 +976,7 @@ function Layout:updateMove(dx, dy)
 			self.ancX = 0
 		end
 	end
+	
 	if dy ~= 0 then
 		local y1 = self.y + dy
 		local y2 = y1 + self.h
@@ -990,6 +1000,8 @@ function Layout:updateMove(dx, dy)
 			self.ancY = 0
 		end
 	end
+	
+	if self.onMove then self:onMove() end
 end
 
 function Layout:updateTexture(texture)

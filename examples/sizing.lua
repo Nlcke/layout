@@ -1,6 +1,6 @@
 local texts = {
-	abs = "absolute\nabsX = 0\nabsY = 0",
-	rel = "relative\nrelX = 0.5\nrelY = 0.5",
+	abs = "absolute\nabsW = 320\nabsH = 240",
+	rel = "relative\nrelW = 0.5\nrelH = 0.5",
 	anc = "anchored\nancX = 0\nancY = 1",
 	grs = "gridsnapped\ncol = 1\nrow = 0",
 }
@@ -17,17 +17,17 @@ local layout = Layout.new{
 	anRemove = Layout.newAnimation(),
 	Layout.new{
 		TextArea.new(font, texts.abs, "|", "C"),
-		absX = 0, absY = 0,
+		absW = 320, absH = 240,
+		absX = 60, absY = 40,
 		
 		bgrC = 0x0000FF, bgrA = 0.5,
-		relW = 0.5, relH = 0.5,
 	},
 		Layout.new{
 		TextArea.new(font, texts.rel, "|", "C"),
-		relX = 0.5, relY = 0.5,
+		relW = 0.5, relH = 0.5,
+		ancX = 0.8, ancY = 0.4,
 		
 		bgrC = 0xFF0000, bgrA = 0.5,
-		relW = 0.5, relH = 0.5,
 	},
 		Layout.new{
 		TextArea.new(font, texts.anc, "|", "C"),
