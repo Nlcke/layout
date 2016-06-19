@@ -54,6 +54,7 @@ for i = 1, #examples do database[i] = {text = examples[-i]} end
 layout = Layout.new{
 	template = Button, database = database,
 	scroll = true,
+	content = true,
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	cellAbsH = 50,

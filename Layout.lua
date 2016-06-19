@@ -144,13 +144,12 @@ local default = {
 	limW = false, -- maximal width/height aspect ratio, [0..]
 	limH = false, -- maximal height/width aspect ratio, [0..]
 	
-	-- relative center (affects rotation and scaling)
-	centerX = 0.5, -- [0..1]
-	centerY = 0.5, -- [0..1]
+	-- scrollable or movable content
+	content = false, -- enables content size updates
 	
 	-- relative content size
-	conRelW = 1, -- content width relative to width of layout
-	conRelH = 1, -- content height relative to height of layout
+	conRelW = 1, -- content width relative to parent, [false|number]
+	conRelH = 1, -- content height relative to parent, [false|number]
 	
 	-- absolute content size (disables relative width and/or height)
 	conAbsW = false, -- content absolute width (in pixels), [false|number]
@@ -180,6 +179,10 @@ local default = {
 	sprS = 1.0, -- sprite scale
 	sprX = 0.5, -- sprite X
 	sprY = 0.5, -- sprite Y
+	
+	-- relative center (affects rotation and scaling)
+	centerX = 0.5, -- [0..1]
+	centerY = 0.5, -- [0..1]
 	
 	-- template grid
 	template    = false, -- Layout or Layout-based class
@@ -494,54 +497,60 @@ function Layout:enterFrame(e)
 	if self.scroll or self.move or self.scale or self.tilt then
 		if self.event == Layout.MOVE_SCROLL then
 			local f = self.moveFriction
-			local rx, ry = self.moveReactionX, self.moveReactionY
 			self.pointerAX = f * (self.pointerAX + self.pointerDX)
 			self.pointerAY = f * (self.pointerAY + self.pointerDY)
-			if self.scroll then
-				self:updateScroll(rx * self.pointerDX, ry * self.pointerDY)
-			end
-			if self.move then
-				self:updateMove(rx * self.pointerDX, ry * self.pointerDY)
-				if self.parent and self.parent.scroll then
-					self.parent:updateScroll(-2 * rx * self.pointerDX,
-						- 2 * ry * self.pointerDY)
-					self.parent.pointerAX, self.parent.pointerAY = 0, 0
+			if self.pointerDX ~= 0 or self.pointerDY ~= 0 then
+				local rx, ry = self.moveReactionX, self.moveReactionY
+				if self.scroll then
+					self:updateScroll(rx*self.pointerDX, ry*self.pointerDY)
 				end
+				if self.move then
+					self:updateMove(rx*self.pointerDX, ry*self.pointerDY)
+					if self.parent and self.parent.scroll then
+						self.parent:updateScroll(-2 * rx * self.pointerDX,
+							- 2 * ry * self.pointerDY)
+						self.parent.pointerAX, self.parent.pointerAY = 0, 0
+					end
+				end
+				self.pointerX = self.pointerX + self.pointerDX
+				self.pointerY = self.pointerY + self.pointerDY
+				self.pointerDX, self.pointerDY = 0, 0
 			end
-			self.pointerX = self.pointerX + self.pointerDX
-			self.pointerY = self.pointerY + self.pointerDY
-			self.pointerDX, self.pointerDY = 0, 0
 		elseif self.event == Layout.SCALE_TILT then
-			local w = application:getDeviceWidth()
-			local h = application:getDeviceHeight()
-			if self.scale then
-				local minS, maxS = self.scaleMin, self.scaleMax
-				local k = self.isMouseMove and -self.scaleMouseResp
-					or self.scaleTouchResp
-				local s = self:getScale() + k * self.pointerDY
-				if s < minS then s = minS elseif s > maxS then s = maxS end
-				self:setScale(s)
-				self.backup.scaleX, self.backup.scaleY = s, s
+			if self.pointerDX ~= 0 or self.pointerDY ~= 0 then
+				if self.scale then
+					local minS, maxS = self.scaleMin, self.scaleMax
+					local k = self.isMouseMove and -self.scaleMouseResp
+						or self.scaleTouchResp
+					local s = self:getScale() + k * self.pointerDY
+					if s < minS then s = minS
+					elseif s > maxS then s = maxS end
+					self:setScale(s)
+					self.backup.scaleX, self.backup.scaleY = s, s
+				end
+				if self.tilt then
+					local k = self.isMouseMove and self.tiltMouseResp
+						or -57.3 * self.tiltTouchResp
+					local r = self:getRotation() + k * self.pointerDX
+					self:setRotation(r)
+					self.backup.rotation = r
+				end
+				self.pointerX = self.pointerX + self.pointerDX
+				self.pointerY = self.pointerY + self.pointerDY
+				self.pointerDX, self.pointerDY = 0, 0
 			end
-			if self.tilt then
-				local k = self.isMouseMove and self.tiltMouseResp
-					or -57.3 * self.tiltTouchResp
-				local r = self:getRotation() + k * self.pointerDX
-				self:setRotation(r)
-				self.backup.rotation = r
-			end
-			self.pointerX = self.pointerX + self.pointerDX
-			self.pointerY = self.pointerY + self.pointerDY
-			self.pointerDX, self.pointerDY = 0, 0
 		elseif self.scroll or self.move then
 			self.pointerAX = math.abs(self.pointerAX) > self.moveDelta and
 				self.moveDamping * self.pointerAX or 0
 			self.pointerAY = math.abs(self.pointerAY) > self.moveDelta and
 				self.moveDamping * self.pointerAY or 0
-			if self.scroll then
-				self:updateScroll(self.pointerAX, self.pointerAY)
-			elseif self.move then
-				self:updateMove(self.pointerAX, self.pointerAY)
+			if self.pointerAX ~= 0 or self.pointerAY ~= 0 then
+				if self.scroll then
+					self:updateScroll(self.pointerAX, self.pointerAY)
+				end
+				if self.move then
+					self:updateMove(self.pointerAX, self.pointerAY)
+				end
 			end
 		end
 	end
@@ -850,7 +859,7 @@ function Layout:update(p, q)
 	if w ~= self.w or h ~= self.h then
 		Mesh.setVertices(self, 1,0,0, 2,w,0, 3,w,h, 4,0,h)
 		self.w, self.h = w, h
-		if self.scroll then self:updateContentSize() end
+		if self.content then self:updateContentSize() end
 	end
 	
 	local offX, offY = self.offX, self.offY

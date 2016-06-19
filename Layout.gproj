@@ -16,17 +16,18 @@
    </export>
   </exports>
  </properties>
- <file source="init.lua"/>
- <folder name="resources">
-  <file source="resources/backbuttonTexture.png"/>
-  <file source="resources/BlissPro-Bold.otf"/>
- </folder>
- <file source="main.lua"/>
  <folder name="examples">
+  <file source="examples/sliders.lua"/>
   <file excludeFromExecution="1" source="examples/sizing.lua"/>
   <file excludeFromExecution="1" source="examples/template_grid.lua"/>
   <file excludeFromExecution="1" source="examples/multiline_text.lua"/>
   <file excludeFromExecution="1" source="examples/positioning.lua"/>
  </folder>
+ <folder name="resources">
+  <file source="resources/backbuttonTexture.png"/>
+  <file source="resources/BlissPro-Bold.otf"/>
+ </folder>
  <file source="Layout.lua"/>
+ <file source="init.lua"/>
+ <file excludeFromExecution="1" source="main.lua"/>
 </project>
