@@ -794,7 +794,7 @@ function Layout:onRelease(e)
 		self.event = Layout.HOVER
 		local parent = self.__parent
 		if parent and parent.isLayout then
-			if Layout.eventsToHover[parent.event] then
+			if eventsToHover[parent.event] then
 				parent.event = Layout.HOVER
 			end
 		end
