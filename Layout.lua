@@ -1281,6 +1281,9 @@ function Layout:play(anim, newstate, mark)
 	if not mark and not anim.mark then
 		error("animation: 'mark' key not found")
 	end
+	if type(newstate) == "function" then
+		mark, newstate = newstate, mark
+	end
 	local frames, animMark, strength = anim.frames, anim.mark, anim.strength
 	anim.frames, anim.mark, anim.strength = nil, nil, nil
 	self:restoreState()
