@@ -211,6 +211,7 @@ local default = {
 	-- identification
 	id  = nil, -- to get child by id with 'layout(id)' call
 	
+	-- inheritance
 	init = false, -- callback at instantiation (useful for custom classes)
 		-- [false|function(self, parameters)]
 	ext  = false, -- callback at children adding (to modify them)
@@ -777,14 +778,14 @@ function Layout:onTouchesMove(e)
 	
 end
 
-Layout.eventsToHover = {
+local eventsToHover = {
 	[Layout.PRESS_HOLD] = true,
 	[Layout.MOVE_SCROLL] = true,
 	[Layout.SCALE_TILT] = true,
 }
 
 function Layout:onRelease(e)
-	if Layout.eventsToHover[self.event] then
+	if eventsToHover[self.event] then
 		if self.event == Layout.PRESS_HOLD then
 			if self.onPress then self:onPress() end
 			if self.event == Layout.REMOVE then return end
@@ -857,7 +858,8 @@ function Layout:update(p, q)
 	if self.limH and h / w > self.limH then h = self.limH * w end
 	
 	if w ~= self.w or h ~= self.h then
-		Mesh.setVertices(self, 1,0,0, 2,w,0, 3,w,h, 4,0,h)
+		--Mesh.setVertices(self, 1,0,0, 2,w,0, 3,w,h, 4,0,h)
+		Mesh.setVertices(self, 1,-1,-1, 2,w+1,-1, 3,w+1,h+1, 4,-1,h+1)
 		self.w, self.h = w, h
 		if self.content then self:updateContentSize() end
 	end

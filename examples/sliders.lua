@@ -37,6 +37,8 @@ Slider = Layout:with{
 }
 
 local layout = Layout.new{
+	anAdd = Layout.newAnimation(),
+	anRemove = Layout.newAnimation(),
 	Slider.new{bgrC = 0x00FF00, relY = 0.0, relH = 0.2},
 	Slider.new{bgrC = 0x00FFFF, relY = 0.2, relH = 0.2},
 	Slider.new{bgrC = 0xFFFF00, relY = 0.4, relH = 0.2},

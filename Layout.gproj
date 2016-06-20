@@ -1,33 +1,36 @@
 <project>
- <properties autorotation="0" logicalWidth="320" osx_org="GiderosMobile" logicalHeight="480" osx_category="5" android_template="0" win_org="GiderosMobile" version_code="1" winrt_org="GiderosMobile" winrt_package="com.yourdomain.yourapp" orientation="0" windowWidth="0" iosDevice="0" windowHeight="0" mouseToTouch="0" retinaDisplay="0" osx_bundle="com.yourdomain." app_icon_noexport="0" architecture="6" assetsOnly="0" osx_domain="giderosmobile.com" version="1.0" html5_host="" html5_mem="256" mouseTouchOrder="0" encryptCode="0" encryptAssets="0" scaleMode="0" fps="60" win_domain="giderosmobile.com" touchToMouse="0" ios_bundle="com.yourdomain." packageName="com.yourdomain.yourapp" app_icon="">
+ <properties winrt_package="com.yourdomain.yourapp" packageName="com.yourdomain.yourapp" html5_mem="256" version="1.0" autorotation="0" windowWidth="0" logicalHeight="480" android_template="0" windowHeight="0" logicalWidth="320" win_domain="giderosmobile.com" mouseToTouch="0" iosDevice="0" osx_domain="giderosmobile.com" osx_bundle="com.yourdomain." html5_host="" encryptAssets="0" fps="60" osx_org="GiderosMobile" version_code="1" assetsOnly="0" win_org="GiderosMobile" winrt_org="GiderosMobile" scaleMode="0" osx_category="5" orientation="0" mouseTouchOrder="0" architecture="6" touchToMouse="0" retinaDisplay="0" encryptCode="0" app_icon="" ios_bundle="com.yourdomain." app_icon_noexport="0">
   <imageScales/>
   <plugins/>
   <exports>
    <export name="APK">
-    <property name="androidPath" value=""/>
-    <property name="androidTarget" value="19"/>
-    <property name="antPath" value=""/>
-    <property name="javaPath" value=""/>
-    <property name="keyAlias" value=""/>
-    <property name="keyAliasPass" value=""/>
-    <property name="keyStore" value=""/>
-    <property name="keyStorePass" value=""/>
-    <property name="packageName" value="com.yourdomain.yourapp"/>
+    <property value="" name="androidPath"/>
+    <property value="19" name="androidTarget"/>
+    <property value="" name="antPath"/>
+    <property value="" name="javaPath"/>
+    <property value="" name="keyAlias"/>
+    <property value="" name="keyAliasPass"/>
+    <property value="" name="keyStore"/>
+    <property value="" name="keyStorePass"/>
+    <property value="com.yourdomain.yourapp" name="packageName"/>
    </export>
   </exports>
  </properties>
  <folder name="examples">
-  <file source="examples/sliders.lua"/>
+  <file excludeFromExecution="1" source="examples/colors.lua"/>
+  <file excludeFromExecution="1" source="examples/texturing.lua"/>
+  <file excludeFromExecution="1" source="examples/sliders.lua"/>
   <file excludeFromExecution="1" source="examples/sizing.lua"/>
   <file excludeFromExecution="1" source="examples/template_grid.lua"/>
   <file excludeFromExecution="1" source="examples/multiline_text.lua"/>
   <file excludeFromExecution="1" source="examples/positioning.lua"/>
  </folder>
  <folder name="resources">
-  <file source="resources/backbuttonTexture.png"/>
+  <file source="resources/backbutton.png"/>
+  <file source="resources/skyworld.png"/>
   <file source="resources/BlissPro-Bold.otf"/>
  </folder>
  <file source="Layout.lua"/>
  <file source="init.lua"/>
- <file excludeFromExecution="1" source="main.lua"/>
+ <file source="main.lua"/>
 </project>

@@ -27,7 +27,7 @@ for i = 1, 1e6 do database[i] = {text = " Button "..i.." "} end
 local layout = Layout.new{
 	bringToFront = function() end,
 	template = Button, database = database,
-	scroll = true,
+	scroll = true, content = true,
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	cellAbsW = 200, cellAbsH = 50,

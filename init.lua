@@ -1,4 +1,5 @@
-backbuttonTexture = Texture.new("resources/backbuttonTexture.png")
+backbuttonTexture = Texture.new("resources/backbutton.png")
+skyworldTexture = Texture.new("resources/skyworld.png")
 
 local function toUTF8(decimal)
 	if decimal < 128 then return string.char(decimal) end
