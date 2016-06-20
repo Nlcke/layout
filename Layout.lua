@@ -1,7 +1,7 @@
 --[[------------------------------------------------------------------------
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Layout API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Layout.new{...} -- new layout with optional settings and/or children
-Layout{...} -- update layout with settings and/or children
+Layout:update{...} -- update layout with settings and/or children
 Layout(id) -- access child layout by it's unique id or it's draw order
 Layout(col, row) -- access cell by it's row and column numbers
 Layout.select(sprite) -- set focus and selector to that sprite
@@ -804,29 +804,8 @@ end
 
 -- UPDATING --
 
-function Layout:update(p, q)
-	if q then
-		if self.template then
-			local cols, rows = self:getGridSize()
-			local i = self.columnsFill and p*rows + q + 1 or q*cols + p + 1
-			return self.database[i]
-		end
-		for i = 1, self:getNumChildren() do
-			local child = self:getChildAt(i)
-			if child.col == p and child.row == q then return child end
-		end
-		return error("cell ("..tostring(p)..","..tostring(q)..") not found")
-	end
-
+function Layout:update(p)
 	if p then
-		if #type(p) ~= 5 then
-			for i = 1, self:getNumChildren() do
-				local child = self:getChildAt(i)
-				if child.id == p then return self:getChildAt(i) end
-			end
-			if tonumber(p) == p then return self:getChildAt(p) end
-			return error("child ("..tostring(p)..") not found")
-		end
 		if self.upd then self:upd(p) end
 		if p.texture ~= nil then
 			if p.texture then
@@ -896,7 +875,27 @@ function Layout:update(p, q)
 	end
 end
 
-Layout.__call = Layout.update
+function Layout.__call(self, p, q)
+	if q then
+		if self.template then
+			local cols, rows = self:getGridSize()
+			local i = self.columnsFill and p*rows + q + 1 or q*cols + p + 1
+			return self.database[i]
+		end
+		for i = 1, self:getNumChildren() do
+			local child = self:getChildAt(i)
+			if child.col == p and child.row == q then return child end
+		end
+		return error("cell ("..tostring(p)..","..tostring(q)..") not found")
+	else
+		for i = 1, self:getNumChildren() do
+			local child = self:getChildAt(i)
+			if child.id == p then return self:getChildAt(i) end
+		end
+		if tonumber(p) == p then return self:getChildAt(p) end
+		return error("child ("..tostring(p)..") not found")
+	end
+end
 
 function Layout:updateColor(texC, texA, bgrC, bgrA)
 	if self.texture then
