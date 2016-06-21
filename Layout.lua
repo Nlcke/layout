@@ -88,7 +88,9 @@ equal to 1 if not defined
 
 -- other animation keys --
 key names are same as Sprite.set accepts:
-	x, y, rotation, rotationX, rotationY, scaleX, scaleY, alpha,
+	x, y, anchorX, anchorY,
+	rotationX, rotationY, scaleX, scaleY,
+	rotation, alpha,
 	redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier
 key values can be [nil|number|function]
 all keys are relative to initial state of layout i.e. 0 means no change
@@ -128,10 +130,6 @@ local default = {
 	relX = false,
 	relY = false,
 	
-	-- relative (to width and height of parent) size
-	relW = 1.0,
-	relH = 1.0,
-	
 	-- absolute positioning (disables relative and anchored one)
 	absX = false, -- absolute X
 	absY = false, -- absolute Y
@@ -139,6 +137,10 @@ local default = {
 	-- absolute size (disables relative and anchored one)
 	absW = false,
 	absH = false,
+	
+	-- relative (to width and height of parent) size
+	relW = 1.0,
+	relH = 1.0,
 	
 	-- 	width/height restriction 
 	limW = false, -- maximal width/height aspect ratio, [0..]
