@@ -1,5 +1,5 @@
 <project>
- <properties winrt_package="com.yourdomain.yourapp" packageName="com.yourdomain.yourapp" html5_mem="256" version="1.0" autorotation="0" windowWidth="0" logicalHeight="480" android_template="0" windowHeight="0" logicalWidth="320" win_domain="giderosmobile.com" mouseToTouch="0" iosDevice="0" osx_domain="giderosmobile.com" osx_bundle="com.yourdomain." html5_host="" encryptAssets="0" fps="60" osx_org="GiderosMobile" version_code="1" assetsOnly="0" win_org="GiderosMobile" winrt_org="GiderosMobile" scaleMode="0" osx_category="5" orientation="0" mouseTouchOrder="0" architecture="6" touchToMouse="0" retinaDisplay="0" encryptCode="0" app_icon="" ios_bundle="com.yourdomain." app_icon_noexport="0">
+ <properties winrt_org="GiderosMobile" app_icon="" iosDevice="0" mouseToTouch="0" osx_domain="giderosmobile.com" logicalHeight="480" version="1.0" orientation="0" assetsOnly="0" encryptAssets="0" winrt_package="com.yourdomain.yourapp" autorotation="0" android_template="0" touchToMouse="0" ios_bundle="com.yourdomain." retinaDisplay="0" logicalWidth="320" windowWidth="0" windowHeight="0" encryptCode="0" version_code="1" osx_bundle="com.yourdomain." win_org="GiderosMobile" app_icon_noexport="0" mouseTouchOrder="0" fps="60" architecture="6" packageName="com.yourdomain.yourapp" html5_mem="256" scaleMode="0" osx_org="GiderosMobile" win_domain="giderosmobile.com" osx_category="5" html5_host="">
   <imageScales/>
   <plugins/>
   <exports>
@@ -17,6 +17,7 @@
   </exports>
  </properties>
  <folder name="examples">
+  <file excludeFromExecution="1" source="image_viewer.lua"/>
   <file excludeFromExecution="1" source="examples/colors.lua"/>
   <file excludeFromExecution="1" source="examples/texturing.lua"/>
   <file excludeFromExecution="1" source="examples/sliders.lua"/>
