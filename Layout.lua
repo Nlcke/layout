@@ -871,9 +871,9 @@ function Layout:update(p)
 	if self.template then return self:updateTemplateGrid() end
 	
 	if self.__children then
-		table.foreach(self.__children, function(_, child)
+		for _,child in pairs(self.__children) do
 			if not child.isLayout then self:updateSprite(child) end
-		end)
+		end
 	end
 end
 
@@ -946,13 +946,11 @@ function Layout:updateScroll(dx, dy)
 	end
 	self.offX, self.offY = offX, offY
 	
-	if self.template then
-		if self.__children then
-			table.foreach(self.__children, function(_, child)
-				if child.frame < child.frames then
-					child.frame = child.frames - 1
-				end
-			end)
+	if self.template and self.__children then
+		for _, child in pairs(self.__children) do
+			if child.frame < child.frames then
+				child.frame = child.frames - 1
+			end
 		end
 		self:updateTemplateGrid()
 	end
@@ -1385,9 +1383,12 @@ function Layout:selectCell(col, row)
 	self.frame = self.frames
 	
 	local cell = nil
-	table.foreach(self.__children, function(_, c)
-		if c.col == col and c.row == row then cell = c; return end
-	end)
+	for _,child in pairs(self.__children) do
+		if child.col == col and child.row == row then
+			cell = child
+			break
+		end
+	end
 	
 	local w = self.cellAbsW or self.cellRelW * self.w
 	local h = self.cellAbsH or self.cellRelH * self.h
@@ -1565,44 +1566,44 @@ function Layout.onKeyOrButton(code)
 		local xMin, xMax = -math.huge, math.huge
 		local yMin, yMax = -math.huge, math.huge
 		if code == "RIGHT" then
-			table.foreach(parent.__children, function(_, child)
+			for _,child in pairs(parent.__children) do
 				local x = child.isLayout and child.x or child:getX()
 				local y = child.isLayout and child.y or child:getY()
 				local dy = math.abs(y - y0)
 				if x > x0 and x <= xMax and dy <= yMax then
 					selected, xMax, yMax = child, x, dy
 				end
-			end)
+			end
 			actions.RIGHT = nil
 		elseif code == "LEFT" then
-			table.foreach(parent.__children, function(_, child)
+			for _,child in pairs(parent.__children) do
 				local x = child.isLayout and child.x or child:getX()
 				local y = child.isLayout and child.y or child:getY()
 				local dy = math.abs(y - y0)
 				if x < x0 and x >= xMin and dy <= yMax then
 					selected, xMin, yMax = child, x, dy
 				end
-			end)
+			end
 			actions.LEFT = nil
 		elseif code == "DOWN" then
-			table.foreach(parent.__children, function(_, child)
+			for _,child in pairs(parent.__children) do
 				local x = child.isLayout and child.x or child:getX()
 				local y = child.isLayout and child.y or child:getY()
 				local dx = math.abs(x - x0)
 				if y > y0 and y <= yMax and dx <= xMax then
 					selected, yMax, xMax = child, y, dx
 				end
-			end)
+			end
 			actions.DOWN = nil
 		elseif code == "UP" then
-			table.foreach(parent.__children, function(_, child)
+			for _,child in pairs(parent.__children) do
 				local x = child.isLayout and child.x or child:getX()
 				local y = child.isLayout and child.y or child:getY()
 				local dx = math.abs(x - x0)
 				if y < y0 and y >= yMin and dx <= xMax then
 					selected, yMin, xMax = child, y, dx
 				end
-			end)
+			end
 			actions.UP = nil
 		end
 		
@@ -1891,9 +1892,9 @@ function TextArea:setText(text)
 	if self.align then
 		local _, child = next(self.__children)
 		local textColor = child and child:getTextColor() or 0x000000
-		table.foreach(self.__children, function(_, child)
+		for _,child in pairs(self.__children) do
 			child:removeFromParent()
-		end)
+		end
 		self:init(self.font, self.text, self.sample, self.align, self.width,
 			self.letterspace, self.linespace)
 		if textColor ~= 0x000000 then self:setTextColor(textColor) end
@@ -1940,11 +1941,11 @@ function TextArea:setLetterSpacing(letterspace)
 		local align = self.align
 		
 		local t, xs, ws, xs0 = {}, self.offsetXs, {}, {}
-		table.foreach(self.__children, function(_, child)
+		for _,child in pairs(self.__children) do
 			child:setLetterSpacing(letterspace)
 			local i = self:getChildIndex(child)
 			t[i], ws[i], xs0[i] = child, child:getWidth(), 0
-		end)
+		end
 		local l = #t
 		
 		if align == "R" then
@@ -2003,9 +2004,9 @@ end
 function TextArea:setTextColor(color)
 	self.textcolor = color
 	if self.__children then
-		table.foreach(self.__children, function(_, child)
+		for _,child in pairs(self.__children) do
 			child:setTextColor(color)
-		end)
+		end
 	end
 end
 
