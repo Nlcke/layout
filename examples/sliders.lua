@@ -11,7 +11,7 @@ Slider = Layout:with{
 	handleHeight = 1,
 	handleCallback = function(self)
 		self.parent.indicator(1):setText(self.ancX)
-		self.parent.indicator{}
+		self.parent.indicator:update()
 	end,
 	
 	init = function(self, p)
