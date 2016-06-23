@@ -836,7 +836,6 @@ function Layout:update(p)
 			end
 		end
 		self:updateColor(p.texC, p.texA, p.bgrC, p.bgrA)
-		if #p > 0 then self:addChildren(p) end
 	end
 	
 	local w = self.col and self.parCellW * self.colW or self.absW or
