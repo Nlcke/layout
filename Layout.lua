@@ -414,15 +414,20 @@ function Layout.new(p)
 	
 	self.backup = {}
 	
-	for k,v in pairs(p) do if tonumber(k) == nil then self[k] = p[k] end end
-	if self.init then self:init(p) end
-	if self.texture then self:setTexture(self.texture) end
+	for k,v in pairs(p) do
+		if tonumber(k) then
+			self:addChild(self.ext and self:ext(v) or v) 
+		else
+			self[k] = v
+		end
+	end
 	
+	if self.init then self:init(p) end
+	
+	if self.texture then self:setTexture(self.texture) end
 	local c = self.texture and self.texC or self.bgrC
 	local a = self.texture and self.texA or self.bgrA
 	Mesh.setColorArray(self, c, a, c, a, c, a, c, a)
-	
-	if #p > 0 then self:addChildren(p) end
 	
 	self:addEventListener(Event.ENTER_FRAME, self.enterFrame, self)
 	
@@ -824,7 +829,11 @@ function Layout:update(p)
 			end
 		end
 		for k,v in pairs(p) do
-			if tonumber(k) == nil then self[k] = p[k] end
+			if tonumber(k) then
+				self:addChild(self.ext and self:ext(v) or v) 
+			else
+				self[k] = v
+			end
 		end
 		self:updateColor(p.texC, p.texA, p.bgrC, p.bgrA)
 		if #p > 0 then self:addChildren(p) end
@@ -1065,17 +1074,6 @@ function Layout:updateSprite(sprite)
 	
 	local w, h = sprite:getWidth(), sprite:getHeight()
 	sprite:setPosition(self.sprX * (pw - w), self.sprY * (ph - h))
-end
-
-function Layout:addChildren(p)
-	if self.ext then
-		for _,child in ipairs(p) do
-			self:addChild(child)
-			self:ext(child)
-		end
-	else
-		for _,child in ipairs(p) do self:addChild(child) end
-	end
 end
 
 function Layout:getGridSize()
