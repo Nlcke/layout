@@ -16,11 +16,6 @@ Layout:with{...}
 	-- extend Layout class (or subclass) with additional parameters
 	-- 'init' and 'upd' functions will be inherited from all parents
 	-- resulting class can be instantiated (new) or extended (with)
-Layout:forEachChild(func, [p1, p2, p3, p4, p5, p6, p7, p8])
-	-- apply function with optional parameters to layout's children
-Layout:forSomeChild(filter, func, [p1, p2, p3, p4, p5, p6, p7, p8])
-	-- apply function with optional parameters to class filtered children
-	-- filter is the string with class names divided by any symbols
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TextArea ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 TextArea class is superpowered version of TextField.
@@ -1120,6 +1115,9 @@ function Layout:updateContentSize()
 end
 
 function Layout:updateTemplateGrid()
+	local isSelected = self == Layout.selected
+	if isSelected then Layout.selector:removeFromParent() end
+	
 	local cols, rows = self:getGridSize()
 	local l, n = #self.database, self:getNumChildren()
 	
@@ -1176,6 +1174,8 @@ function Layout:updateTemplateGrid()
 			end
 		end
 	end
+	
+	if isSelected then self:getChildAt(1):select() end
 end
 
 -- ANIMATION --
@@ -1365,7 +1365,6 @@ function Layout:select()
 		Layout.selector:setFillColor(Layout.selFillC, Layout.selFillA)
 		Layout.selector:setPosition(0, 0)
 	end
-	
 	self:addChild(Layout.selector)
 end
 
@@ -1739,30 +1738,6 @@ function Layout.loadFromPath(p)
 		end
 	end
 	return t
-end
-
-function Layout:forEachChild(func, p1, p2, p3, p4, p5, p6, p7, p8)
-	for i = 1, self:getNumChildren() do
-		func(self:getChildAt(i), p1, p2, p3, p4, p5, p6, p7, p8)
-	end
-end
-
-function Layout:forSomeChild(filter, func, p1, p2, p3, p4, p5, p6, p7, p8)
-	local class = filter:match "[A-Za-z]+"
-	local _, pos = filter:find(class)
-	local filter = filter:sub(pos+1)
-	local found = #filter == 0
-	for i = 1, self:getNumChildren() do
-		local child = self:getChildAt(i)
-		if child:getClass() == class then
-			if found then
-				func(child, p1, p2, p3, p4, p5, p6, p7, p8)
-			else
-				Layout.forSomeChild(child, filter, func,
-					p1, p2, p3, p4, p5, p6, p7, p8)
-			end
-		end
-	end
 end
 
 -- TEXTAREA
