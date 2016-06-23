@@ -815,11 +815,15 @@ function Layout:update(p)
 	if p then
 		if self.upd then self:upd(p) end
 		if p.texture ~= nil then
+			local c, a
 			if p.texture then
 				self:setTexture(p.texture)
+				c, a = self.texC, self.texA
 			else
 				self:clearTexture()
-			end		
+				c, a = self.bgrC, self.bgrA
+			end
+			Mesh.setColorArray(self, c, a, c, a, c, a, c, a)
 		end
 		if p.events ~= nil then
 			if p.events then
