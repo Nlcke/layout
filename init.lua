@@ -1,4 +1,6 @@
 backbuttonTexture = Texture.new("resources/backbutton.png")
+leftbuttonTexture = Texture.new("resources/leftbutton.png")
+rightbuttonTexture = Texture.new("resources/rightbutton.png")
 skyworldTexture = Texture.new("resources/skyworld.png")
 
 local function toUTF8(decimal)
