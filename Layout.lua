@@ -54,6 +54,8 @@ Layout.loadFromPath{...} where {...} is a table with following parameters:
 	to      = number  -- index of last resource file to load
 	output  = boolean -- print list of resource files
 	namemod = function(name, path, base, ext, i) -- to filter file names
+	onlynames = boolean -- instead of resources return filenames
+	
 	textureFiltering = boolean
 	textureOptions   = table
 	fontSize         = number
@@ -1647,6 +1649,7 @@ function Layout.loadFromPath(p)
 	local to = p.to or 1e15
 	local namemod = p.namemod
 	local output = p.output
+	local onlynames = p.onlynames
 	
 	local textureFiltering = p.textureFiltering
 	local textureOptions = p.textureOptions
@@ -1696,6 +1699,8 @@ function Layout.loadFromPath(p)
 		end
 		if not filenamemod then
 			i = i - 1
+		elseif onlynames then
+			data = filename
 		elseif i < from then
 			filenamemod = nil
 		elseif i > to then

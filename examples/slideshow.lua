@@ -2,12 +2,11 @@ local path = "d:/Images/Fruits" -- set this path to your images
 
 local texturenames = Layout.loadFromPath{
 	path = path,
+	onlynames = true,
 	from = 1, to = 100,
 	namemod = function(n, p, b, e, i)
 		if e == ".jpg" or e == ".png" then return n end
 	end,
-	[".jpg"] = function() return true end,
-	[".png"] = function() return true end,
 }
 
 if not texturenames then 
@@ -22,7 +21,7 @@ end
 local i, l = 1, #texturenames
 
 local thisImage = Layout.new{
-	texture = Texture.new(texturenames[-i], true),
+	texture = Texture.new(texturenames[i], true),
 }
 
 local nextImage = Layout.new{bgrA = 0.5}
@@ -34,7 +33,7 @@ local label = Layout.new{
 	relX = 0.1, relY = 0.9,
 	sprM = Layout.FIT_HEIGHT, sprX = 1,
 	bgrA = 0.5,
-	TextArea.new(font, texturenames[-i])
+	TextArea.new(font, texturenames[i])
 }
 
 label(1):setTextColor(0xFFFFFF)
@@ -53,11 +52,11 @@ local leftbutton = Layout.new{
 		thisImage:removeFromParent()
 		nextImage:update{
 			anAdd = Layout.newAnimation(),
-			texture = Texture.new(texturenames[-i], true),
+			texture = Texture.new(texturenames[i], true),
 		}
 		imageframe:addChild(nextImage)
 		thisImage, nextImage = nextImage, thisImage
-		label(1):setText(texturenames[-i])
+		label(1):setText(texturenames[i])
 		label:update()		
 	end
 }
@@ -76,11 +75,11 @@ local rightbutton = Layout.new{
 		thisImage:removeFromParent()
 		nextImage:update{
 			anAdd = Layout.newAnimation(),
-			texture = Texture.new(texturenames[-i], true),
+			texture = Texture.new(texturenames[i], true),
 		}
 		imageframe:addChild(nextImage)
 		thisImage, nextImage = nextImage, thisImage
-		label(1):setText(texturenames[-i])
+		label(1):setText(texturenames[i])
 		label:update()		
 	end
 }

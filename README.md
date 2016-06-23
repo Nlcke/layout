@@ -449,6 +449,8 @@ from    = number  -- index of first resource file to load
 to      = number  -- index of last resource file to load
 output  = boolean -- print list of resource files
 namemod = function(name, path, base, ext, i) -- to filter file names
+onlynames = boolean -- instead of resources return filenames
+
 textureFiltering = boolean
 textureOptions   = table
 fontSize         = number

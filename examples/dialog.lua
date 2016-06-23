@@ -11,7 +11,7 @@ Label = Layout:with{
 	
 	upd = function(self, p)
 		if p.text then self.textfield:setText(p.text, "|") end
-	end,	
+	end,
 }
 
 Button = Label:with{
