@@ -20,7 +20,7 @@ Slider = Layout:with{
 			sprX = 0,
 			TextArea.new(font, "0", "fg|")
 		}
-		table.insert(p, self.indicator)
+		self:addChild(self.indicator)
 		self.handle = Layout.new{
 			ancX = 0,
 			ancY = 0,
@@ -32,7 +32,7 @@ Slider = Layout:with{
 			move = true,
 			onMove = self.handleCallback
 		}
-		table.insert(p, self.handle)
+		self:addChild(self.handle)
 	end
 }
 
