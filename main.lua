@@ -20,6 +20,7 @@ local backbutton = Layout.new{
 			child:removeFromParent()
 		end
 		stage:addChild(layout)
+		Layout.select(layout)
 	end
 }
 
@@ -35,7 +36,6 @@ Button = Layout:with{
 	end,
 	
 	upd = function(self, p)
-		print(self, p.text)
 		if p.text then self.textfield:setText(p.text, "|") end
 	end,
 	
@@ -64,3 +64,5 @@ layout = Layout.new{
 }
 
 stage:addChild(layout)
+
+Layout.select(layout)
