@@ -8,7 +8,7 @@ Button = Layout:with{
 	init = function(self, p)
 		self.textfield = TextArea.new(font, self.text, "|")
 		self.textfield:setTextColor(self.textColor)
-		table.insert(p, self.textfield)
+		self:addChild(self.textfield)
 	end,
 	
 	upd = function(self, p)
