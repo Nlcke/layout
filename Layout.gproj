@@ -1,5 +1,5 @@
 <project>
- <properties html5_mem="256" encryptAssets="0" retinaDisplay="0" win_domain="giderosmobile.com" osx_bundle="com.yourdomain." version_code="1" ios_bundle="com.yourdomain." winrt_org="GiderosMobile" assetsOnly="0" windowWidth="0" encryptCode="0" autorotation="0" osx_category="5" packageName="com.yourdomain.yourapp" mouseToTouch="0" version="1.0" orientation="0" html5_host="" iosDevice="0" mouseTouchOrder="0" windowHeight="0" logicalWidth="320" architecture="6" android_template="0" fps="60" app_icon="" osx_org="GiderosMobile" osx_domain="giderosmobile.com" app_icon_noexport="0" touchToMouse="0" logicalHeight="480" winrt_package="com.yourdomain.yourapp" win_org="GiderosMobile" scaleMode="0">
+ <properties logicalHeight="480" android_template="0" ios_bundle="com.yourdomain." encryptAssets="0" scaleMode="0" mouseToTouch="0" windowHeight="0" retinaDisplay="0" orientation="0" version_code="1" winrt_package="com.yourdomain.yourapp" assetsOnly="0" winrt_org="GiderosMobile" logicalWidth="320" touchToMouse="0" mouseTouchOrder="0" encryptCode="0" architecture="6" osx_domain="giderosmobile.com" fps="60" html5_host="" app_icon="" iosDevice="0" app_icon_noexport="0" osx_bundle="com.yourdomain." version="1.0" windowWidth="0" osx_org="GiderosMobile" win_org="GiderosMobile" win_domain="giderosmobile.com" packageName="com.yourdomain.yourapp" osx_category="5" html5_mem="256" autorotation="0">
   <imageScales/>
   <plugins/>
   <exports>
@@ -17,17 +17,17 @@
   </exports>
  </properties>
  <folder name="examples">
-  <file excludeFromExecution="1" source="examples/colors.lua"/>
-  <file excludeFromExecution="1" source="examples/dialog.lua"/>
-  <file excludeFromExecution="1" source="examples/file_explorer.lua"/>
-  <file excludeFromExecution="1" source="examples/multiline_text.lua"/>
-  <file excludeFromExecution="1" source="examples/positioning.lua"/>
-  <file excludeFromExecution="1" source="examples/sizing.lua"/>
-  <file excludeFromExecution="1" source="examples/sliders.lua"/>
-  <file excludeFromExecution="1" source="examples/slideshow.lua"/>
-  <file excludeFromExecution="1" source="examples/template_grid.lua"/>
-  <file excludeFromExecution="1" source="examples/texturing.lua"/>
-  <file excludeFromExecution="1" source="examples/thumbnail_viewer.lua"/>
+  <file source="examples/colors.lua" excludeFromExecution="1"/>
+  <file source="examples/dialog.lua" excludeFromExecution="1"/>
+  <file source="examples/file_explorer.lua" excludeFromExecution="1"/>
+  <file source="examples/multiline_text.lua" excludeFromExecution="1"/>
+  <file source="examples/positioning.lua" excludeFromExecution="1"/>
+  <file source="examples/sizing.lua" excludeFromExecution="1"/>
+  <file source="examples/sliders.lua" excludeFromExecution="1"/>
+  <file source="examples/slideshow.lua" excludeFromExecution="1"/>
+  <file source="examples/template_grid.lua" excludeFromExecution="1"/>
+  <file source="examples/texturing.lua" excludeFromExecution="1"/>
+  <file source="examples/thumbnail_viewer.lua" excludeFromExecution="1"/>
  </folder>
  <folder name="resources">
   <file source="resources/BlissPro-Bold.otf"/>
