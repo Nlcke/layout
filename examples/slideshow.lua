@@ -9,7 +9,7 @@ local texturenames = Layout.newResources{
 if not texturenames then 
 	local layout = Layout.new{
 		bgrC = 0xFF0000, bgrA = 0.5,
-		TextField.new(font, "No images in "..path, "|")
+		TextField.new(font, "No images in "..imagepath, "|")
 	}
 	stage:addChild(layout)
 	return

@@ -29,7 +29,6 @@ local function newText(text)
 	local y = 0
 	for line in (text.."\n"):gmatch(".-\n") do
 		local textfield = TextField.new(font, line, "|")
-		print(line, y)
 		textfield:setY(y)
 		sprite:addChild(textfield)
 		y = y + textfield:getLineHeight()
