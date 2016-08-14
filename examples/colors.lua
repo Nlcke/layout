@@ -1,4 +1,4 @@
-database = {}
+local database = {}
 
 for r = 0, 255, 2 do
 	for g = 0, 255, 2 do
@@ -9,13 +9,13 @@ for r = 0, 255, 2 do
 	end
 end
 
-layout = Layout.new{
+local layout = Layout.new{
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	bringToFront = function() end,
     template = Layout, database = database,
     scroll = true, content = true,
-    cellAbsW = 16, cellAbsH = 16,
+    cellAbsW = 64, cellAbsH = 64,
     cols = 1024,
 }
 

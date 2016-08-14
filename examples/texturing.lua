@@ -5,33 +5,51 @@ local layout = Layout.new{
 	Layout.new{
 		texture = skyworldTexture,
 		texM = Layout.FIT_ALL,
-		TextArea.new(font, "texM = Layout.FIT_ALL", "|", "C"),
+		TextField.new(font, "FIT_ALL", "|"),
 		col = 0, row = 0,
 	},
-		Layout.new{
+	Layout.new{
 		texture = skyworldTexture,
 		texM = Layout.STRETCH,
-		TextArea.new(font, "texM = Layout.STRETCH", "|", "C"),
+		TextField.new(font, "STRETCH", "|"),
 		col = 1, row = 0,
 	},
-		Layout.new{
+	Layout.new{
 		texture = skyworldTexture,
 		texM = Layout.FIT_WIDTH,
-		TextArea.new(font, "texM = Layout.FIT_WIDTH", "|", "C"),
+		TextField.new(font, "FIT_WIDTH", "|"),
 		col = 2, row = 0,
 	},
-		Layout.new{
+	Layout.new{
 		texture = skyworldTexture,
 		texM = Layout.FIT_HEIGHT,
-		TextArea.new(font, "texM = Layout.FIT_HEIGHT", "|", "C"),
+		TextField.new(font, "FIT_HEIGHT", "|"),
 		col = 3, row = 0,
 	},
-		Layout.new{
+	Layout.new{
 		texture = skyworldTexture,
 		texM = Layout.CROP,
-		TextArea.new(font, "texM = Layout.CROP", "|", "C"),
+		TextField.new(font, "CROP", "|"),
 		col = 4, row = 0,
 	},
+	Layout.new{
+		cellRelH = 1/4,
+		Layout.new{row = 0,
+			TextField.new(font, "texM = Layout.CROP", "|"),
+		},
+		Layout.new{row = 1,
+			TextField.new(font, "texX = 0.75", "|"),
+		},
+		Layout.new{row = 2,
+			TextField.new(font, "texY = 0.25", "|"),
+		},
+		Layout.new{row = 3,
+			TextField.new(font, "texS = 1.5", "|"),
+		},
+		texture = skyworldTexture,
+		texM = Layout.CROP, texX = 0.75, texY = 0.25, texS = 1.5,
+		col = 0, row = 1, colW = 5,
+	},	
 }
 
 stage:addChild(layout)

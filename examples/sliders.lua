@@ -18,7 +18,7 @@ Slider = Layout:with{
 		self.indicator = Layout.new{
 			sprM = Layout.FIT_HEIGHT,
 			sprX = 0,
-			TextArea.new(font, "0", "fg|")
+			TextField.new(font, "0", "fg|")
 		}
 		self:addChild(self.indicator)
 		self.handle = Layout.new{

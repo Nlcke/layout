@@ -1,4 +1,4 @@
-local examples = Layout.loadFromPath{
+local examples = Layout.newResources{
 	path = "|R|examples",
 	namemod = function(name, path, base, ext, i) return base end
 }
@@ -24,19 +24,25 @@ local backbutton = Layout.new{
 	end
 }
 
+backbutton:addEventListener(Event.ENTER_FRAME, function()
+	if backbutton:getParent() == stage then
+		stage:addChild(backbutton)
+	end
+end)
+
 Button = Layout:with{
 	text = "BUTTON",
 	textColor = 0xFFFFFF,
 	bgrA = 1.0,
 	
 	init = function(self, p)
-		self.textfield = TextArea.new(font, self.text, "|")
+		self.textfield = TextField.new(font, self.text, "Pq|")
 		self.textfield:setTextColor(self.textColor)
 		self:addChild(self.textfield)
 	end,
 	
 	upd = function(self, p)
-		if p.text then self.textfield:setText(p.text, "|") end
+		if p.text then self.textfield:setText(p.text) end
 	end,
 	
 	anPress = Layout.newAnimation(14, 7, 0.04),

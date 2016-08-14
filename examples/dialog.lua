@@ -4,7 +4,7 @@ Label = Layout:with{
 	bgrA = 1.0,
 	
 	init = function(self, p)
-		self.textfield = TextArea.new(font, self.text, "|")
+		self.textfield = TextField.new(font, self.text, "|")
 		self.textfield:setTextColor(self.textColor)
 		self:addChild(self.textfield)
 	end,

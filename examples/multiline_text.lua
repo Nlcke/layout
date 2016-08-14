@@ -1,22 +1,48 @@
-local text = [[
-The MIT License (MIT)
+local quotes = {
+[["If Java had true garbage
+collection, most programs
+would delete themselves
+upon execution."
+-- Robert Sewell]],
+[["There are only two things
+wrong with C++:
+The initial concept and
+the implementation."
+-- Bertrand Meyer]],
+[["Ruby performance tuning
+really feels like trying
+to get the best miles per
+gallon out of a tricycle."
+-- David R. MacIver]],
+[["A C program is like a fast
+dance on a newly waxed dance
+floor by people carrying razors."
+-- Waldi Ravens.]],
+[["FORTRAN is not a flower but
+a weed -- it is hardy, occasionally
+blooms, and grows in every computer."
+-- Alan J. Perlis.]]
+}
 
-Copyright (c) <year> <copyright holders>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.]]
-
-local textarea = TextArea.new(font, text, "  |", "J", 4000, nil, -20)
-textarea:setTextColor(0xFF88FF)
+local function newText(text)
+	local sprite = Sprite.new()
+	local y = 0
+	for line in (text.."\n"):gmatch(".-\n") do
+		local textfield = TextField.new(font, line, "|")
+		print(line, y)
+		textfield:setY(y)
+		sprite:addChild(textfield)
+		y = y + textfield:getLineHeight()
+	end
+	return sprite
+end
 
 local layout = Layout.new{
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
-	bgrA = 0.5,
-	textarea
+	bgrC = 0x00BBFF, bgrA = 0.5,
+	cols = 1, rows = 4, cellRelW = 1, cellRelH = 0.25,
+	newText(quotes[math.random(1, #quotes)])
 }
 
 stage:addChild(layout)

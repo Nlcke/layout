@@ -17,28 +17,6 @@ Layout:with{...}
 	-- 'init' and 'upd' functions will be inherited from all parents
 	-- resulting class can be instantiated (new) or extended (with)
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TextArea ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-TextArea class is superpowered version of TextField.
-TextArea has normal anchoring as opposed to TextField and supports multiline
-text with different alignment modes and first-line indentation.
-TextArea can be created with:
-TextArea.new(font, text, sample, align, width, letterspace, linespace)
-where
-	font        = TTFont | Font
-	text        = string
-	sample      = string | nil
-	align       = "L" | "C" | "R" | "J" | nil
-	width       = number | nil
-	letterspace = number | nil
-	linespace   = number | nil
-TextArea has following setters and getters:
-	setText          - getText
-	setSample        - getSample
-	setAlignment     - getAlignment
-	setLetterSpacing - getLetterSpacing
-	setLineSpacing   - getLineSpacing
-	setTextColor     - getTextColor
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Resource Loader ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Layout has optional resource loader	to automatically load various resources.
 From the box it supports .jpg, .png, .wav, .mp3, .ttf, .otf, .lua, .json.
@@ -46,7 +24,7 @@ Resource Loader returs a table with resources, their names and indexes where
 resources can be accessed with t[integer_number] or t[resource_name] and
 resource name can be received with negative index i.e. t[-integer_number].
 It has following interface:
-Layout.loadFromPath{...} where {...} is a table with following parameters:
+Layout.newResources{...} where {...} is a table with following parameters:
 	path    = string  -- path to directory with resources
 	subdirs = boolean -- load resources from subdirectories
 	names   = string  -- table of names to filter directory files
@@ -189,8 +167,8 @@ local default = {
 	columnsFill = false, -- columns will be filled first if true
 	
 	-- borders for cells
-	borderW = 0, -- cell border width
-	borderH = 0, -- cell border height
+	borderW = 0, -- cell border width in pixels
+	borderH = 0, -- cell border height in pixels
 	
 	cols = 0, -- grid columns (integer) number, [0..]
 	rows = 0, -- grid rows (integer) number, [0..]
@@ -233,7 +211,7 @@ local default = {
 		[21]  =     "UP",
 		[22]  =   "DOWN",
 		[105] =  "RIGHT",
-		--[???] = "LEFT", -- controller plugin is broken (only on Windows?)
+		--[???] = "LEFT", -- controller plugin is broken for desktop
 		[96]  = "SELECT",
 		[97]  =   "BACK",
 		
@@ -287,29 +265,6 @@ local default = {
 }
 
 for k,v in pairs(default) do Layout[k] = v end
-
-function Layout.newAnimation(frames, mark, strength, seed)
-	if seed then math.randomseed(seed) end
-	return {
-		frames          = frames or 60,
-		mark            = mark or 0.5,
-		strength        = strength or 1,
-		x               = math.random(-1, 1),
-		y               = math.random(-1, 1),
-		anchorX         = math.random(-1, 1),
-		anchorY         = math.random(-1, 1),
-		rotation        = math.random(-1, 1),
-		rotationX       = math.random(-1, 1),
-		rotationY       = math.random(-1, 1),
-		scaleX          = math.random(-1, 1),
-		scaleY          = math.random(-1, 1),
-		alpha           = math.random(-1, 0),
-		redMultiplier   = math.random(-1, 0),
-		greenMultiplier = math.random(-1, 0),
-		blueMultiplier  = math.random(-1, 0),
-		alphaMultiplier = math.random(-1, 0),
-	}
-end
 
 local internal = {
 	isLayout = true,
@@ -829,6 +784,14 @@ function Layout:update(p)
 				self:disableEvents()
 			end
 		end
+		if p.database ~= nil then
+			self.offX, self.offY = 0, 0
+			if self.__children then
+				for i, child in pairs(self.__children) do
+					child:removeFromParent()
+				end
+			end
+		end
 		for k,v in pairs(p) do
 			if tonumber(k) then
 				self:addChild(self.ext and self:ext(v) or v) 
@@ -1056,8 +1019,11 @@ function Layout:updateSprite(sprite)
 
 	sprite:setPosition(0, 0)
 	sprite:setScale(1.0)
-	local w, h = sprite:getWidth(), sprite:getHeight()
-
+	
+	local w = sprite:getWidth()
+	local isText = getmetatable(sprite).getSample
+	local h = isText and sprite:getLineHeight() or sprite:getHeight()
+	
 	if     self.sprM == Layout.FIT_ALL then
 		sprite:setScale(self.sprS * math.min(pw / w, ph / h))
 	elseif self.sprM == Layout.STRETCH then
@@ -1069,10 +1035,11 @@ function Layout:updateSprite(sprite)
 	elseif self.sprM == Layout.CROP then
 		sprite:setScale(self.sprS * math.max(pw / w, ph / h))
 	else
-		error("sprite mode '" .. tostring(self.texM) .. "' not found")
+		error("sprite mode '" .. tostring(self.sprM) .. "' not found")
 	end
 	
-	local w, h = sprite:getWidth(), sprite:getHeight()
+	local w = sprite:getWidth()
+	local h = isText and sprite:getScale() * h or sprite:getHeight()
 	sprite:setPosition(self.sprX * (pw - w), self.sprY * (ph - h))
 end
 
@@ -1100,12 +1067,12 @@ function Layout:updateContentSize()
 		self.conH = fh * rows - self.borderH
 	else
 		if self.cols > 0 then
-			self.conW = (self.cellAbsW or self.cellRelW * w) * self.cols
+			self.conW = (self.cellAbsW or self.cellRelW * self.w) * self.cols
 		else
 			self.conW = self.conAbsW or self.conRelW * self.w
 		end
 		if self.rows > 0 then
-			self.conH = (self.cellAbsH or self.cellRelH * h) * self.rows
+			self.conH = (self.cellAbsH or self.cellRelH * self.h) * self.rows
 		else
 			self.conH = self.conAbsH or self.conRelH * self.h
 		end
@@ -1177,7 +1144,9 @@ function Layout:updateTemplateGrid()
 		end
 	end
 	
-	if isSelected then self:getChildAt(1):select() end
+	if isSelected and self:getNumChildren() > 0 then
+		self:getChildAt(1):select()
+	end
 end
 
 -- ANIMATION --
@@ -1639,9 +1608,37 @@ function Layout.onKeyOrButton(code)
 	end
 end
 
--- RESOURCE LOADER --
+function Layout.newAnimation(frames, mark, strength, seed)
+	if frames and tonumber(frames) == nil then
+		local p = frames
+		frames = p.frames
+		mark = p.mark
+		strength = p.strength
+		seed = p.seed
+	end
+	if seed then math.randomseed(seed) end
+	return {
+		frames          = frames or 60,
+		mark            = mark or 0.5,
+		strength        = strength or 1,
+		x               = math.random(-1, 1),
+		y               = math.random(-1, 1),
+		anchorX         = math.random(-1, 1),
+		anchorY         = math.random(-1, 1),
+		rotation        = math.random(-1, 1),
+		rotationX       = math.random(-1, 1),
+		rotationY       = math.random(-1, 1),
+		scaleX          = math.random(-1, 1),
+		scaleY          = math.random(-1, 1),
+		alpha           = math.random(-1, 0),
+		redMultiplier   = math.random(-1, 0),
+		greenMultiplier = math.random(-1, 0),
+		blueMultiplier  = math.random(-1, 0),
+		alphaMultiplier = math.random(-1, 0),
+	}
+end
 
-function Layout.loadFromPath(p)
+function Layout.newResources(p)
 	local path = p.path
 	local subdirs = p.subdirs
 	local names = p.names
@@ -1669,6 +1666,8 @@ function Layout.loadFromPath(p)
 	
 	if not names then
 		names = {}
+		local ok, err = pcall(lfs.dir, path)
+		if not ok then return nil, err end
 		local iter, dir = lfs.dir(path)
 		while true do
 			local name = dir:next()
@@ -1700,6 +1699,8 @@ function Layout.loadFromPath(p)
 		if not filenamemod then
 			i = i - 1
 		elseif onlynames then
+			local att = lfs.attributes(filename)
+			if att.mode == "directory" then filename = filename.."/" end
 			data = filename
 		elseif i < from then
 			filenamemod = nil
@@ -1743,258 +1744,4 @@ function Layout.loadFromPath(p)
 		end
 	end
 	return t
-end
-
--- TEXTAREA
-
-TextArea = Core.class(Sprite)
-
-TextArea.defaultFont = Font.getDefault()
-
-function TextArea:init(font, text, sample,
-align, width, letterspace, linespace)
-	font = font or TextArea.defaultFont
-	sample = sample or text
-	local x, y, w, h = font:getBounds(sample)
-	
-	if not align then
-		local child = TextField.new(font, text)
-		self:addChild(child)
-		if sample ~= text then
-			local _
-			x, _, w, _ = font:getBounds(text)
-		end
-		child:setPosition(-x, -y)
-		
-		self.font = font
-		self.text = text
-		self.sample = sample
-		self.offsetY = y
-		self.heightmul = h / Sprite.getHeight(self)
-		return
-	end
-	
-	local lines = {}
-	
-	if width then
-		local words = {}
-		local p1, p2 = sample:find"[ ]+"
-		local indent = p2 and (" "):rep(p2 - p1 + 1)
-		local text = text:gsub("\n", " \n ")
-		for word in text:gmatch"([^ ]+)" do table.insert(words, word) end
-		local line0 = indent
-		for i, word in ipairs(words) do
-			local newline = word == "\n"
-			if newline then
-				if words[i-1] == "\n" then
-					table.insert(lines, "")
-				elseif line0 then
-					table.insert(lines, line0)
-					line0 = indent
-				end
-			else
-				local line = line0 and line0 .. " " .. word or word
-				local _, _, lw, _ = font:getBounds(line)
-				if lw > width then
-					table.insert(lines, line0 or line)
-					line0 = line0 and word
-				else
-					line0 = line
-				end
-			end
-		end
-		table.insert(lines, line0)
-	else
-		for line in text:gmatch"[^\r\n]+" do table.insert(lines, line) end
-	end
-	
-	local t, xs, xs0, ws = {}, {}, {}, {}
-	local w = 0
-	local widest = 0
-	local l = #lines
-	
-	for k,line in ipairs(lines) do
-		local lx, _, lw, _ = font:getBounds(line)
-		if lw > w then w = lw; widest = k end
-		t[k], xs[k], ws[k], xs0[k] = TextField.new(font, line), lx, lw, 0
-	end
-	
-	if letterspace then
-		for i = 1, l do
-			t[i]:setLetterSpacing(letterspace)
-			ws[i] = t[i]:getWidth()
-		end
-		w = ws[widest]
-	end
-	
-	if align == "R" then
-		for i = 1, l do xs0[i] = w - ws[i] end
-	elseif align == "C" then
-		for i = 1, l do xs0[i] = 0.5 * (w - ws[i]) end
-	elseif align == "J" then
-		local nls = (letterspace or 0) + 1
-		for i = 1, l - 1 do
-			local nextline = lines[i+1]
-			if nextline ~= "" and nextline:sub(1,1) ~= " " then
-				local child = t[i]
-				local w0 = ws[i]
-				child:setLetterSpacing(nls)
-				local w1 = child:getWidth()
-				local s = math.floor((w - w0) / (w1 - w0))
-				child:setLetterSpacing(s)
-			end
-		end
-	end
-	
-	linespace = linespace or 0
-	local h = h + linespace
-	for i = 1, l do
-		t[i]:setPosition(xs0[i] - xs[i], (i - 1) * h - y)
-		self:addChild(t[i])
-	end
-	
-	self.font = font
-	self.text = text
-	self.sample = sample
-	self.align = align
-	self.letterspace = letterspace or 0
-	self.linespace = linespace or 0
-	self.heightmul =  (l * h - linespace) / Sprite.getHeight(self)
-	self.textcolor = 0x000000
-	self.width = w
-	self.lineheight = h - linespace
-	self.offsetY = y
-	self.widest = widest
-	self.offsetXs = xs
-end
-
-function TextArea:setText(text)
-	self.text = text
-	if self.align then
-		local _, child = next(self.__children)
-		local textColor = child and child:getTextColor() or 0x000000
-		for _,child in pairs(self.__children) do
-			child:removeFromParent()
-		end
-		self:init(self.font, self.text, self.sample, self.align, self.width,
-			self.letterspace, self.linespace)
-		if textColor ~= 0x000000 then self:setTextColor(textColor) end
-	else
-		local _, child = next(self.__children)
-		local h0 = Sprite.getHeight(self)
-		child:setText(text)
-		self.heightmul = self.heightmul * h0 / Sprite.getHeight(self)
-	end
-end
-
-function TextArea:getText(color)
-	return self.text
-end
-
-function TextArea:setSample(sample)
-	self.sample = sample or self.text
-	local x, y, w, h = self.font:getBounds(self.sample)
-	if self.align then
-		self.offsetY, self.lineheight = y, h
-		self:setLineSpacing(self.linespace)
-	else
-		local _, child = next(self.__children)
-		child:setY(-y)
-		self.offsetY = y
-		self.heightmul = h / Sprite.getHeight(self)
-	end
-end
-
-function TextArea:getSample()
-	return self.sample
-end
-
-function TextArea:setLetterSpacing(letterspace)
-	self.letterspace = letterspace
-	if not self.align then
-		local _, child = next(self.__children)
-		child:setLetterSpacing(letterspace)
-	elseif self.__children then
-		local child = self:getChildAt(self.widest)
-		child:setLetterSpacing(letterspace)
-		self.width = child:getWidth()
-		local w = self.width
-		local align = self.align
-		
-		local t, xs, ws, xs0 = {}, self.offsetXs, {}, {}
-		for _,child in pairs(self.__children) do
-			child:setLetterSpacing(letterspace)
-			local i = self:getChildIndex(child)
-			t[i], ws[i], xs0[i] = child, child:getWidth(), 0
-		end
-		local l = #t
-		
-		if align == "R" then
-			for i = 1, l do xs0[i] = w - ws[i] end
-		elseif align == "C" then
-			for i = 1, l do xs0[i] = 0.5 * (w - ws[i]) end
-		elseif align == "J" then
-			local nls = (letterspace or 0) + 1
-			for i = 1, l - 1 do
-				local nextline = t[i+1]:getText()
-				if nextline ~= "" and nextline:sub(1,1) ~= " " then
-					local child = t[i]
-					local w0 = ws[i]
-					child:setLetterSpacing(nls)
-					local w1 = child:getWidth()
-					local s = math.floor((w - w0) / (w1 - w0))
-					child:setLetterSpacing(s)
-				end
-			end
-		end
-		
-		for i = 1, l do t[i]:setX(xs0[i] - xs[i]) end
-	end	
-end
-
-function TextArea:getLetterSpacing(color)
-	return self.letterspace
-end
-
-function TextArea:setLineSpacing(linespace)
-	self.linespace = linespace
-	if not self.__children then return end
-	local h = self.lineheight + linespace
-	local y = self.offsetY
-	local l = self:getNumChildren()
-	for i = 1, l do
-		local child = self:getChildAt(i)
-		child:setY((i - 1) * h - y)
-	end
-	self.heightmul = (l * h - linespace) / Sprite.getHeight(self)
-end
-
-function TextArea:getLineSpacing()
-	return self.linespace
-end
-
-function TextArea:setAlignment(align)
-	self.align = align
-	self:setLetterSpacing(self.letterspace)
-end
-
-function TextArea:getAlignment()
-	return self.align
-end
-
-function TextArea:setTextColor(color)
-	self.textcolor = color
-	if self.__children then
-		for _,child in pairs(self.__children) do
-			child:setTextColor(color)
-		end
-	end
-end
-
-function TextArea:getTextColor()
-	return self.textcolor
-end
-
-function TextArea:getHeight()
-	return self.heightmul * Sprite.getHeight(self)
 end

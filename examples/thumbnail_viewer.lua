@@ -1,7 +1,5 @@
-local path = "d:/Images/Fruits" -- set this path to your images
-
-local textures = Layout.loadFromPath{
-	path = path,
+local textures = Layout.newResources{
+	path = imagepath,
 	from = 1, to = 100,
 	namemod = function(n, p, b, e, i)
 		if e == ".jpg" or e == ".png" then return b end
@@ -11,7 +9,7 @@ local textures = Layout.loadFromPath{
 if not textures then 
 	local layout = Layout.new{
 		bgrC = 0xFF0000, bgrA = 0.5,
-		TextArea.new(font, "No images in "..path, "fg|", "C")
+		TextField.new(font, "No images in "..path, "|")
 	}
 	stage:addChild(layout)
 	return

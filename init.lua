@@ -1,24 +1,14 @@
+imagepath = "d:/Images/Fruits" -- set this path to your images
 backbuttonTexture = Texture.new("resources/backbutton.png")
 leftbuttonTexture = Texture.new("resources/leftbutton.png")
 rightbuttonTexture = Texture.new("resources/rightbutton.png")
 skyworldTexture = Texture.new("resources/skyworld.png")
-
-local function toUTF8(decimal)
-	if decimal < 128 then return string.char(decimal) end
-	local charbytes = {}
-	for bytes,vals in ipairs {{0x7FF,192}, {0xFFFF,224}, {0x1FFFFF,240}} do
-		if decimal <= vals[1] then
-			for b = bytes+1, 2, -1 do
-				local mod = decimal % 64
-				decimal = (decimal - mod) / 64
-				charbytes[b] = string.char(128 + mod)
-			end
-			charbytes[1] = string.char(vals[2] + decimal)
-			break
-		end
-	end
-	return table.concat(charbytes)
-end
+splashscreenPack = TexturePack.new("resources/splashscreen.txt",
+	"resources/splashscreen.png")
+splashscreenDesc = io.open("resources/splashscreen.txt", "rb"):read"*a"
+fruitsPack = TexturePack.new("resources/fruits.txt", "resources/fruits.png")
+fruitsDesc = io.open("resources/fruits.txt", "rb"):read"*a"
+deviceOS = application:getDeviceInfo()
 
 local function getFontCache(charsets)
 	local t = {}
@@ -26,7 +16,7 @@ local function getFontCache(charsets)
 	for k,v in ipairs(charsets) do
 		for i = v[1], v[2] do
 			n = n + 1
-			t[n] = toUTF8(i)
+			t[n] = utf8.char(i)
 		end
 	end
 	return table.concat(t)

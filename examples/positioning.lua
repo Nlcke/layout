@@ -1,47 +1,70 @@
-local texts = {
-	abs = "absolute\nabsX = 0\nabsY = 0",
-	rel = "relative\nrelX = 0.5\nrelY = 0.5",
-	anc = "anchored\nancX = 0\nancY = 1",
-	grs = "gridsnapped\ncol = 1\nrow = 0",
-}
-
-local spaces = (" "):rep(30)
-
-for k,v in pairs(texts) do
-	texts[k] = spaces .. "\n" .. v .. "\n" .. spaces 
-end
-
 local layout = Layout.new{
-	cellRelW = 0.5, cellRelH = 0.5,
+	cellRelW = 0.4, cellRelH = 0.4,
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	Layout.new{
-		TextArea.new(font, texts.abs, "|", "C"),
-		absX = 0, absY = 0,
+		Layout.new{
+			relH = 1/3, relY = 0/3, TextField.new(font, "absolute:", "|"),
+		},
+		Layout.new{
+			relH = 1/3, relY = 1/3, TextField.new(font, "absX = 10", "|"),
+		},
+		Layout.new{
+			relH = 1/3, relY = 2/3, TextField.new(font, "absY = 20", "|"),
+		},
+		
+		absX = 10, absY = 20,
 		
 		bgrC = 0x0000FF, bgrA = 0.5,
-		relW = 0.5, relH = 0.5,
+		relW = 0.4, relH = 0.4,
 	},
+	Layout.new{
 		Layout.new{
-		TextArea.new(font, texts.rel, "|", "C"),
-		relX = 0.5, relY = 0.5,
+			relH = 1/3, relY = 0/3, TextField.new(font, "relative:", "|"),
+		},
+		Layout.new{
+			relH = 1/3, relY = 1/3, TextField.new(font, "relX = 0.55", "|"),
+		},
+		Layout.new{
+			relH = 1/3, relY = 2/3, TextField.new(font, "relY = 0.55", "|"),
+		},
+		
+		relX = 0.55, relY = 0.55,
 		
 		bgrC = 0xFF0000, bgrA = 0.5,
-		relW = 0.5, relH = 0.5,
+		relW = 0.4, relH = 0.4,
 	},
+	Layout.new{
 		Layout.new{
-		TextArea.new(font, texts.anc, "|", "C"),
-		ancX = 0, ancY = 1,
+			relH = 1/3, relY = 0/3, TextField.new(font, "anchored:", "|"),
+		},
+		Layout.new{
+			relH = 1/3, relY = 1/3, TextField.new(font, "ancX = 0.1", "|"),
+		},
+		Layout.new{
+			relH = 1/3, relY = 2/3, TextField.new(font, "ancY = 0.85", "|"),
+		},
+		
+		ancX = 0.1, ancY = 0.85,
 		
 		bgrC = 0x000000, bgrA = 0.5,
-		relW = 0.5, relH = 0.5,
+		relW = 0.4, relH = 0.4,
 	},
+	Layout.new{
 		Layout.new{
-		TextArea.new(font, texts.grs, "|", "C"),
-		col = 1, row = 0, 
+			relH = 1/3, relY = 0/3, TextField.new(font, "gridsnapped:", "|"),
+		},
+		Layout.new{
+			relH = 1/3, relY = 1/3, TextField.new(font, "col = 1.25", "|"),
+		},
+		Layout.new{
+			relH = 1/3, relY = 2/3, TextField.new(font, "row = 0.05", "|"),
+		},
+		
+		col = 1.25, row = 0.05, 
 		
 		bgrC = 0x00FF00, bgrA = 0.5,
-		relW = 0.5, relH = 0.5,
+		relW = 0.4, relH = 0.4,
 	},
 }
 

@@ -1,9 +1,6 @@
-local path = "d:/Images/Fruits" -- set this path to your images
-
-local texturenames = Layout.loadFromPath{
-	path = path,
+local texturenames = Layout.newResources{
+	path = imagepath,
 	onlynames = true,
-	from = 1, to = 100,
 	namemod = function(n, p, b, e, i)
 		if e == ".jpg" or e == ".png" then return n end
 	end,
@@ -12,7 +9,7 @@ local texturenames = Layout.loadFromPath{
 if not texturenames then 
 	local layout = Layout.new{
 		bgrC = 0xFF0000, bgrA = 0.5,
-		TextArea.new(font, "No images in "..path, "fg|", "C")
+		TextField.new(font, "No images in "..path, "|")
 	}
 	stage:addChild(layout)
 	return
@@ -24,16 +21,17 @@ local thisImage = Layout.new{
 	texture = Texture.new(texturenames[i], true),
 }
 
-local nextImage = Layout.new{bgrA = 0.5}
+local nextImage = Layout.new{}
 
 local imageframe = Layout.new{thisImage}
 
 local label = Layout.new{
 	relW = 0.8, relH = 0.1,
 	relX = 0.1, relY = 0.9,
-	sprM = Layout.FIT_HEIGHT, sprX = 1,
+	sprM = Layout.FIT_HEIGHT,
+	sprX = 1,
 	bgrA = 0.5,
-	TextArea.new(font, texturenames[i])
+	TextField.new(font, texturenames[i], "|")
 }
 
 label(1):setTextColor(0xFFFFFF)
