@@ -1728,7 +1728,7 @@ function Layout.newResources(p)
 				p.path = filename
 				local p_names = p.names
 				p.names = nil
-				data = Layout.loadFromPath(p)
+				data = Layout.newResources(p)
 				p.path = path
 				p.names = p_names
 			end
