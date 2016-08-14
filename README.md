@@ -13,7 +13,6 @@ Layout is GUI framework for Gideros game engine.
 * Template grids
 * Kinetic scrolling and moving
 * Move/Scale/Rotate for images' preview
-* TextArea class as TextField replacement
 * Resource loader
 
 ## Table of Contents
@@ -29,7 +28,6 @@ Layout is GUI framework for Gideros game engine.
   * [`Layout:play(animation [,state] [,callback])`](#layout-play)
   * [`Layout.newAnimation([frames] [,mark] [,strength] [,seed])`](#layout-new-animation)
 * [Layout Keys](#layout-keys)
-* [TextArea API](#textarea-api)
 * [Resource Loader API](#resource-loader-api)
 * [Animation:](#animation)
   * [Special Keys](#special-keys)
@@ -38,14 +36,14 @@ Layout is GUI framework for Gideros game engine.
 * [MIT License](#mit-license)
 
 ## <a name = "installation">Installation</a>
-Copy `Layout.lua` file to your Gideros project and you will get access to `Layout` and `TextArea` classes. Or you can copy all this Gideros project, run it in Gideros Studio and look at examples and their code.
+Copy `Layout.lua` file to your Gideros project and you will get access to `Layout` class without the need to require it. If you want to look at Layout examples then just download everything from this git and open `Layout.gproj` in Gideros Studio.
 
 ## <a name = "hello-world">Hello, world!</a>
 ```lua
 layout = Layout.new{} -- create empty layout
 stage:addChild(layout)      -- add it to the stage
-textarea = TextArea.new(nil, "Hello, World!")
-layout:update{textarea}            -- update layout
+textfield = TextField.new(nil, "Hello, World!", "|")
+layout:update{textfield}            -- update layout
 ```
 ### <a name = "layout-api">Layout API</a>
 #### <a name = "layout-new">Layout.new(p)</a>
@@ -95,7 +93,7 @@ Button = Layout:with{
 	bgrA = 1.0,
 	
 	init = function(self, p)
-		self.textfield = TextArea.new(font, self.text, "|")
+		self.textfield = TextField.new(font, self.text, "|")
 		self.textfield:setTextColor(self.textColor)
 		table.insert(p, self.textfield)
 	end,
@@ -162,14 +160,14 @@ Each layout and sprite can have optional `col` and `row` numeric keys when used 
 ```lua
 grid = Layout.new{
 	cellAbsW = 200, cellAbsH = 100,
-	Layout.new{col = 0, row = 0, TextArea.new(nil, "Cell [0, 0]"},
-	Layout.new{col = 1, row = 0, TextArea.new(nil, "Cell [1, 0]"},
-    Layout.new{col = 0, row = 1, TextArea.new(nil, "Cell [0, 1]"},
-    Layout.new{col = 1, row = 1, TextArea.new(nil, "Cell [1, 1]"},
-    Layout.new{col = 0.5, row = 0.5, TextArea.new(nil, "Cell [0.5, 0.5]"},
+	Layout.new{col = 0, row = 0, TextField.new(nil, "Cell [0, 0]", "|")},
+	Layout.new{col = 1, row = 0, TextField.new(nil, "Cell [1, 0]", "|")},
+    Layout.new{col = 0, row = 1, TextField.new(nil, "Cell [0, 1]", "|")},
+    Layout.new{col = 1, row = 1, TextField.new(nil, "Cell [1, 1]", "|")},
+    Layout.new{col = 0.5, row = 0.5, TextField.new(nil, "Cell [0.5, 0.5]", "|")},
 }
-grid(0, 0){bgrA = 0.5}
-grid(0.5, 0.5){bgrA = 0.8}
+grid(0, 0):update{bgrA = 0.5}
+grid(0.5, 0.5):update{bgrA = 0.8}
 ```
 If template grid used then you will get a table from database, not an layout. In this case you need to call `updateTemplateGrid` method in order to update the scene.:
 ```
@@ -384,53 +382,7 @@ anRemove = false, -- ending animation (mark=-1)
 anPress  = false, -- press animation (mark>0)
 anHover  = false, -- hover animation (mark>0) 
 ```
-### <a name = "textarea-api">TextArea API</a>
-TextArea class is superpowered version of TextField.
-TextArea has normal anchoring as opposed to TextField and supports multiline
-text with different alignment modes and first-line indentation.
-TextArea can be created with:
 
-`TextArea.new(font, text, sample, align, width, letterspace, linespace)`
-where
-```
-	font        = TTFont | Font
-	text        = string
-	sample      = string | nil
-	align       = "L" | "C" | "R" | "J" | nil
-	width       = number | nil
-	letterspace = number | nil
-	linespace   = number | nil
-```
-* `font` is TTFont or Font file, same as for TextField.
-* `text` is a string, same as for TextField.
-* `sample` is a string which overwrites a height of `text` and optionally adds first-line indentation. For example, if you have "note" text and "|" sample the result will have "|" height so all lines will have same height. To enable first-line indentation you need to use `width` parameter and prefix `sample` with spaces. Each line after '\n' chars will be indented. If sample is not defined then it will be copied from `text`.
-* `align` is alignment for multiline text an can be the following char: "L" (left) | "C" (center) | "R" (right) | "J" (justified). If `align` is not defined then you will get oneline text.
-* `width` is optional width of multiline text. When defined the text will be automatically splitted into lines to fit into this width. If not defined then text will be splitted by '\n' chars.
-* `letterspace` is a space between characters so you can narrow or widen the text with it.
-* `linespace` is a space between lines for multiline text. It will be added to normal height of lines (i.e. to height of `sample`).
-
-TextArea has following setters and getters:
-```
-setText          - getText
-setSample        - getSample
-setAlignment     - getAlignment
-setLetterSpacing - getLetterSpacing
-setLineSpacing   - getLineSpacing
-setTextColor     - getTextColor
-```
-HINT: In order to get better justified text you need to use higher font size (greater than 100) and then downscale the result. This is because `TextField.setLetterSpacing` function which internally used by TextArea class for text justification ("J"-alignment) unfortunately rounds down it's arguments.
-
-Examples:
-```lua
-local font = TTFont.new("Airstream.ttf", 40)
-local text = [[
-The MIT License (MIT)
-Copyright (c) <year> <copyright holders>
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:]]
-local textarea = TextArea.new(font, text, "  fg|", "J", 800, 0, -10)
-textarea:setTextColor(0x0088BB)
-stage:addChild(textarea)
-```
 ### <a name = "resource-loader-api">Resource Loader API</a>
 Layout has optional resource loader	to automatically load various resources.
 From the box it supports .jpg, .png, .wav, .mp3, .ttf, .otf, .lua, .json.
@@ -440,7 +392,7 @@ resource name can be received with negative index i.e. t[-integer_number].
 
 It has following interface:
 
-`Layout.loadFromPath(p)` where `p` is a table with following parameters:
+`Layout.newResources(p)` where `p` is a table with following parameters:
 ```lua
 path    = string  -- path to directory with resources
 subdirs = boolean -- load resources from subdirectories
@@ -459,7 +411,7 @@ fontFiltering    = boolean
 ```
 Examples:
 ```lua
-local examples = Layout.loadFromPath{
+local examples = Layout.newResources{
 	path = "|R|examples",
 	namemod = function(name, path, base, ext, i) return base end
 }
