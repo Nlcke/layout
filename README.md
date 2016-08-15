@@ -267,8 +267,10 @@ texM = Layout.FIT_ALL, -- texture scale mode
 texC = 0xFFFFFF, -- texture color
 texA = 1.0, -- texture alpha
 texS = 1.0, -- texture scale
-texX = 0.5, -- texture X
-texY = 0.5, -- texture Y
+texAncX = 0.5,   -- texture anchored X, [0..1]
+texAncY = 0.5,   -- texture anchored Y, [0..1]
+texOffX = 0,     -- texture X offset (in pixels)
+texOffY = 0,     -- texture Y offset (in pixels)
 
 -- non-layout sprites
 sprM = Layout.FIT_ALL, -- sprite scale mode

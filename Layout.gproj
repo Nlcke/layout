@@ -1,17 +1,17 @@
 <project>
- <properties version="1.0" winrt_org="GiderosMobile" html5_host="" encryptCode="0" ios_bundle="com.yourdomain." fps="60" mouseToTouch="0" winrt_package="com.yourdomain.yourapp" mouseTouchOrder="0" windowHeight="0" osx_domain="giderosmobile.com" html5_mem="256" tv_icon="" win_org="GiderosMobile" architecture="6" logicalHeight="480" version_code="1" splash_v_image="" orientation="0" osx_category="5" encryptAssets="0" splash_h_image="" app_icon="" logicalWidth="320" autorotation="0" iosDevice="0" scaleMode="0" assetsOnly="0" osx_org="GiderosMobile" touchToMouse="0" android_template="0" osx_bundle="com.yourdomain." retinaDisplay="3" win_domain="giderosmobile.com" windowWidth="0" packageName="com.yourdomain.yourapp">
+ <properties android_template="0" splash_h_image="" packageName="com.yourdomain.yourapp" html5_mem="256" app_icon="" mouseTouchOrder="0" scaleMode="0" win_org="GiderosMobile" retinaDisplay="3" html5_host="" version_code="1" osx_org="GiderosMobile" winrt_package="com.yourdomain.yourapp" tv_icon="" encryptAssets="0" touchToMouse="0" encryptCode="0" assetsOnly="0" osx_domain="giderosmobile.com" win_domain="giderosmobile.com" mouseToTouch="0" ios_bundle="com.yourdomain." architecture="6" windowHeight="0" fps="60" osx_category="5" winrt_org="GiderosMobile" splash_v_image="" windowWidth="0" logicalHeight="480" version="1.0" logicalWidth="320" autorotation="0" osx_bundle="com.yourdomain." iosDevice="0" orientation="0">
   <imageScales/>
   <plugins/>
   <exports>
    <export name="APK">
-    <property value="" name="androidPath"/>
-    <property value="23" name="androidSdk"/>
-    <property value="19" name="androidTarget"/>
-    <property value="23.0.1" name="androidTools"/>
-    <property value="" name="javaPath"/>
-    <property value="" name="keyAlias"/>
-    <property value="" name="keyStore"/>
-    <property value="com.yourdomain.yourapp" name="packageName"/>
+    <property name="androidPath" value=""/>
+    <property name="androidSdk" value="23"/>
+    <property name="androidTarget" value="19"/>
+    <property name="androidTools" value="23.0.1"/>
+    <property name="javaPath" value=""/>
+    <property name="keyAlias" value=""/>
+    <property name="keyStore" value=""/>
+    <property name="packageName" value="com.yourdomain.yourapp"/>
    </export>
   </exports>
  </properties>
@@ -38,6 +38,7 @@
   <file source="resources/fruits.txt"/>
   <file source="resources/leftbutton.png"/>
   <file source="resources/rightbutton.png"/>
+  <file source="resources/ringtile.png"/>
   <file source="resources/skyworld.png"/>
   <file source="resources/splashscreen.png"/>
   <file source="resources/splashscreen.txt"/>

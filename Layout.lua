@@ -146,10 +146,12 @@ local default = {
 	texture = false, -- texture object (from Texture.new)
 	texM = Layout.FIT_ALL, -- texture scale mode
 	texC = 0xFFFFFF, -- texture color
-	texA = 1.0, -- texture alpha
-	texS = 1.0, -- texture scale
-	texX = 0.5, -- texture X
-	texY = 0.5, -- texture Y
+	texA = 1.0,      -- texture alpha
+	texS = 1.0,      -- texture scale
+	texAncX = 0.5,   -- texture anchored X, [0..1]
+	texAncY = 0.5,   -- texture anchored Y, [0..1]
+	texOffX = 0,     -- texture X offset (in pixels)
+	texOffY = 0,     -- texture Y offset (in pixels)
 	
 	-- non-layout sprites
 	sprM = Layout.FIT_ALL, -- sprite scale mode
@@ -1008,7 +1010,8 @@ function Layout:updateTexture(texture)
 		error("texture mode '" .. tostring(self.texM) .. "' not found")
 	end
 	
-	local x, y = self.texX*(tw0 - w), self.texY*(th0 - h)
+	local x = self.texAncX*(tw0 - w) + self.texOffX
+	local y = self.texAncY*(th0 - h) + self.texOffY
 	self:setTextureCoordinates(1, x, y, 2, x+w, y, 3, x+w, y+h, 4, x, y+h)
 end
 

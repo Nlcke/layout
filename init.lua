@@ -8,7 +8,7 @@ splashscreenPack = TexturePack.new("resources/splashscreen.txt",
 splashscreenDesc = io.open("resources/splashscreen.txt", "rb"):read"*a"
 fruitsPack = TexturePack.new("resources/fruits.txt", "resources/fruits.png")
 fruitsDesc = io.open("resources/fruits.txt", "rb"):read"*a"
-deviceOS = application:getDeviceInfo()
+ringtile = Texture.new("resources/ringtile.png", true, {wrap = Texture.REPEAT})
 
 local function getFontCache(charsets)
 	local t = {}
