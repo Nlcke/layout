@@ -792,6 +792,7 @@ function Layout:update(p)
 		if p.database ~= nil then
 			self.offX, self.offY = 0, 0
 			self.w, self.h = 0, 0
+			self:selectCell(0, 0)
 			if self.__children then
 				for i, child in pairs(self.__children) do
 					child:removeFromParent()
