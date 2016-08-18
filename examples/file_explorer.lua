@@ -4,7 +4,7 @@ local roots = {}
 for name in lfs.dir "/." do
 	local root = "/"..name
 	local att = lfs.attributes(root)
-	if att.mode == "directory" then
+	if att and att.mode == "directory" then
 		table.insert(roots, root)
 	end
 end

@@ -1,7 +1,25 @@
 <project>
- <properties android_template="0" splash_h_image="" packageName="com.yourdomain.yourapp" html5_mem="256" app_icon="" mouseTouchOrder="0" scaleMode="0" win_org="GiderosMobile" retinaDisplay="3" html5_host="" version_code="1" osx_org="GiderosMobile" winrt_package="com.yourdomain.yourapp" tv_icon="" encryptAssets="0" touchToMouse="0" encryptCode="0" assetsOnly="0" osx_domain="giderosmobile.com" win_domain="giderosmobile.com" mouseToTouch="0" ios_bundle="com.yourdomain." architecture="6" windowHeight="0" fps="60" osx_category="5" winrt_org="GiderosMobile" splash_v_image="" windowWidth="0" logicalHeight="480" version="1.0" logicalWidth="320" autorotation="0" osx_bundle="com.yourdomain." iosDevice="0" orientation="0">
+ <properties android_template="0" splash_h_image="" packageName="com.yourdomain.yourapp" html5_mem="256" app_icon="" mouseTouchOrder="0" scaleMode="0" win_org="GiderosMobile" retinaDisplay="3" html5_host="" version_code="1" osx_org="GiderosMobile" winrt_package="com.yourdomain.yourapp" tv_icon="" encryptAssets="0" touchToMouse="0" encryptCode="0" assetsOnly="0" osx_domain="giderosmobile.com" win_domain="giderosmobile.com" mouseToTouch="0" ios_bundle="com.yourdomain." architecture="0" windowHeight="0" fps="60" osx_category="5" winrt_org="GiderosMobile" splash_v_image="" windowWidth="0" logicalHeight="480" version="1.0" logicalWidth="320" autorotation="0" osx_bundle="com.yourdomain." iosDevice="0" orientation="0">
   <imageScales/>
-  <plugins/>
+  <plugins>
+   <plugin name="Controller" enabled="0"/>
+   <plugin name="LuaSqlite3" enabled="0"/>
+   <plugin name="Native" enabled="0"/>
+   <plugin name="Camera" enabled="1"/>
+   <plugin name="Media plugin" enabled="0"/>
+   <plugin name="Lpeg" enabled="0"/>
+   <plugin name="LuaFileSystem" enabled="0"/>
+   <plugin name="Clipper" enabled="0"/>
+   <plugin name="Flurry" enabled="0"/>
+   <plugin name="JSON" enabled="0"/>
+   <plugin name="Countly" enabled="0"/>
+   <plugin name="Store Detector" enabled="0"/>
+   <plugin name="Lua Socket" enabled="0"/>
+   <plugin name="Struct" enabled="0"/>
+   <plugin name="Gaming" enabled="0"/>
+   <plugin name="Bitop" enabled="0"/>
+   <plugin name="Google Play Services" enabled="0"/>
+  </plugins>
   <exports>
    <export name="APK">
     <property name="androidPath" value=""/>

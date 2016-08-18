@@ -1703,7 +1703,7 @@ function Layout.newResources(p)
 			i = i - 1
 		elseif onlynames then
 			local att = lfs.attributes(filename)
-			if att.mode == "directory" then filename = filename.."/" end
+			if att and att.mode == "directory" then filename = filename.."/" end
 			data = filename
 		elseif i < from then
 			filenamemod = nil
