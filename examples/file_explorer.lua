@@ -80,6 +80,7 @@ Button = Layout:with{
 		panel1:removeFromParent()
 		layout:addChild(panel2)
 		panel1, panel2 = panel2, panel1
+		Layout.select(panel1)
 	end
 }
 
