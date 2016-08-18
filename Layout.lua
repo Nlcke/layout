@@ -206,6 +206,9 @@ local default = {
 		[16777237] =   "DOWN", -- jump to downward cell
 		[16777220] = "SELECT", -- enter the layout or press it
 		[16777219] =   "BACK", -- return to parent layout or stage
+		
+		-- mouse wheel for "UP" and "DOWN" actions
+		mouseWheel = true,
 	},
 	
 	-- gamepad control, can have multiple buttons for the same action
@@ -1490,6 +1493,14 @@ stage:addEventListener(Event.KEY_UP, function(e)
 		actions[code] = nil
 		Layout.selected.event = Layout.IDLE
 		if code == "SELECT" then select() end
+	end
+end)
+
+stage:addEventListener(Event.MOUSE_WHEEL, function(e)
+	local keys = Layout.selected.isLayout and
+		Layout.selected.keys or Layout.keys
+	if keys.mouseWheel then
+		Layout.onKeyOrButton(e.wheel > 0 and "UP" or "DOWN")
 	end
 end)
 

@@ -325,6 +325,9 @@ keys = { -- [realCode] = action
 	[16777237] =   "DOWN", -- jump to downward cell
 	[16777220] = "SELECT", -- enter the layout or press it
 	[16777219] =   "BACK", -- return to parent layout or stage
+	
+	-- mouse wheel for "UP" and "DOWN" actions
+	mouseWheel = true,
 },
 
 -- gamepad control, can have multiple buttons for the same action
