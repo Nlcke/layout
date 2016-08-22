@@ -47,11 +47,14 @@ Button = Layout:with{
 	
 	anPress = Layout.newAnimation(14, 7, 0.04),
 	anHover = Layout.newAnimation(14, 7, 0.02),
+	selFillC = 0x0088FF, selFillA = 0.25,
 	
 	onPress = function(self)
+		stage:addChild(backbutton)
+		Layout.select(backbutton)
 		examples[self.text]()
 		layout:removeFromParent()
-		stage:addChild(backbutton)
+		
 	end
 }
 
@@ -59,8 +62,7 @@ local database = {}
 for i = 1, #examples do database[i] = {text = examples[-i]} end
 
 layout = Layout.new{
-	template = Button, database = database,
-	scroll = true,
+	template = Button, database = database, scroll = true,
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	cellAbsH = 50,

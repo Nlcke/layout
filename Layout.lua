@@ -403,8 +403,13 @@ function Layout:enterFrame(e)
 		self.parCellW = parent.cellAbsW or parent.cellRelW * parent.w
 		self.parCellH = parent.cellAbsH or parent.cellRelH * parent.h
 	elseif parent == stage then
-		self.parW = application:getDeviceWidth()
-		self.parH = application:getDeviceHeight()
+		if application:getScaleMode() == "noScale" then
+			self.parW = application:getDeviceWidth()
+			self.parH = application:getDeviceHeight()			
+		else
+			self.parW = application:getContentWidth()
+			self.parH = application:getContentHeight()
+		end
 	else
 		Sprite.removeFromParent(self)
 		self.parW = parent:getWidth()
