@@ -121,9 +121,6 @@ local default = {
 	limW = false, -- maximal width/height aspect ratio, [0..]
 	limH = false, -- maximal height/width aspect ratio, [0..]
 	
-	-- scrollable or movable content
-	content = false, -- enables content size updates
-	
 	-- relative content size
 	conRelW = 1, -- content width relative to parent, [false|number]
 	conRelH = 1, -- content height relative to parent, [false|number]
@@ -253,8 +250,9 @@ local default = {
 	onHover  = false, -- callback at mouse hovering, [false|function]
 	onPress  = false, -- callback at LMB or touch press, [false|function]
 	onHold   = false, -- callback at LMB or touch while hold, [false|function]
-	onMove   = false, -- callback at layout moving
-	onScroll = false, -- callback at layout scrolling
+	onMove   = false, -- callback at layout moving, [false|function]
+	onScroll = false, -- callback at layout scrolling, [false|function]
+	onBack   = false, -- callback at "BACK" action, [false|function]
 	
 	-- built-in callbacks
 	scroll = false, -- move children with mouse or touch, [false|true]
@@ -821,7 +819,29 @@ function Layout:update(p)
 		--Mesh.setVertices(self, 1,0,0, 2,w,0, 3,w,h, 4,0,h)
 		Mesh.setVertices(self, 1,-1,-1, 2,w+1,-1, 3,w+1,h+1, 4,-1,h+1)
 		self.w, self.h = w, h
-		if self.content then self:updateContentSize() end
+		if self.template then
+			local cols, rows = self:getGridSize()
+			local w = self.cellAbsW or self.cellRelW * self.w
+			local h = self.cellAbsH or self.cellRelH * self.h
+			local fw, fh = w + self.borderW, h + self.borderH
+			self.conW = fw * cols - self.borderW
+			self.conH = fh * rows - self.borderH
+		else
+			if self.cols > 0 then
+				self.conW = (self.cellAbsW or self.cellRelW * self.w) * self.cols
+			else
+				self.conW = self.conAbsW or self.conRelW * self.w
+			end
+			if self.rows > 0 then
+				self.conH = (self.cellAbsH or self.cellRelH * self.h) * self.rows
+			else
+				self.conH = self.conAbsH or self.conRelH * self.h
+			end
+		end
+		self.scrW = math.max(0, self.conW - self.w)
+		self.scrH = math.max(0, self.conH - self.h)
+		self.offX = math.min(self.offX, self.scrW)
+		self.offY = math.min(self.offY, self.scrH)
 	end
 	
 	local offX, offY = self.offX, self.offY
@@ -1063,32 +1083,6 @@ function Layout:getGridSize()
 		cols = math.ceil(num/rows)
 	end
 	return cols, rows, num
-end
-
-function Layout:updateContentSize()
-	if self.template then
-		local cols, rows = self:getGridSize()
-		local w = self.cellAbsW or self.cellRelW * self.w
-		local h = self.cellAbsH or self.cellRelH * self.h
-		local fw, fh = w + self.borderW, h + self.borderH
-		self.conW = fw * cols - self.borderW
-		self.conH = fh * rows - self.borderH
-	else
-		if self.cols > 0 then
-			self.conW = (self.cellAbsW or self.cellRelW * self.w) * self.cols
-		else
-			self.conW = self.conAbsW or self.conRelW * self.w
-		end
-		if self.rows > 0 then
-			self.conH = (self.cellAbsH or self.cellRelH * self.h) * self.rows
-		else
-			self.conH = self.conAbsH or self.conRelH * self.h
-		end
-	end
-	self.scrW = math.max(0, self.conW - self.w)
-	self.scrH = math.max(0, self.conH - self.h)
-	self.offX = math.min(self.offX, self.scrW)
-	self.offY = math.min(self.offY, self.scrH)
 end
 
 function Layout:updateTemplateGrid()
@@ -1409,20 +1403,25 @@ Layout.selected = stage
 local actions = {}
 
 local function select()
-	if Layout.selected.onPress then
-		Layout.selected:onPress()
+	local selected = Layout.selected
+	if selected.onPress then
+		selected:onPress()
 	else
 		Sprite.removeFromParent(Layout.selector)
-		local selected = Layout.selected
 		local n = selected:getNumChildren()
 		if n > 0 then
 			if selected.template then
 				selected:selectCell(selected.selectedCol,
 					selected.selectedRow)
 			else
-				Layout.select(selected:getChildAt(n))
+				local child = selected:getChildAt(n)
+				if child.isLayout then
+					Layout.select(child)
+				else
+					Layout.select(selected)
+				end
 			end
-		end				
+		end
 	end
 end
 
@@ -1525,14 +1524,13 @@ function Layout.onKeyOrButton(code)
 		end
 	elseif code == "BACK" then
 		actions.BACK = nil
-		if parent then Layout.select(parent) end
+		if parent and parent.isLayout then Layout.select(parent) end
+		if selected.onBack then selected:onBack(parent) end
 	elseif not actions.SELECT and not actions.BACK then
 		if not parent then return end
 		if parent:getNumChildren() == 1 then return end
 		
-		if selected.isLayout then
-			selected.event = Layout.HOVER
-		end
+		if selected.isLayout then selected.event = Layout.HOVER end
 		
 		if parent.template then
 			local col, row = parent.selectedCol, parent.selectedRow
@@ -1554,41 +1552,45 @@ function Layout.onKeyOrButton(code)
 		local yMin, yMax = -math.huge, math.huge
 		if code == "RIGHT" then
 			for _,child in pairs(parent.__children) do
-				local x = child.isLayout and child.x or child:getX()
-				local y = child.isLayout and child.y or child:getY()
-				local dy = math.abs(y - y0)
-				if x > x0 and x <= xMax and dy <= yMax then
-					selected, xMax, yMax = child, x, dy
+				if child.isLayout then
+					local x, y = child.x, child.y
+					local dy = math.abs(y - y0)
+					if x > x0 and x <= xMax and dy <= yMax then
+						selected, xMax, yMax = child, x, dy
+					end
 				end
 			end
 			actions.RIGHT = nil
 		elseif code == "LEFT" then
 			for _,child in pairs(parent.__children) do
-				local x = child.isLayout and child.x or child:getX()
-				local y = child.isLayout and child.y or child:getY()
-				local dy = math.abs(y - y0)
-				if x < x0 and x >= xMin and dy <= yMax then
-					selected, xMin, yMax = child, x, dy
+				if child.isLayout then
+					local x, y = child.x, child.y
+					local dy = math.abs(y - y0)
+					if x < x0 and x >= xMin and dy <= yMax then
+						selected, xMin, yMax = child, x, dy
+					end
 				end
 			end
 			actions.LEFT = nil
 		elseif code == "DOWN" then
 			for _,child in pairs(parent.__children) do
-				local x = child.isLayout and child.x or child:getX()
-				local y = child.isLayout and child.y or child:getY()
-				local dx = math.abs(x - x0)
-				if y > y0 and y <= yMax and dx <= xMax then
-					selected, yMax, xMax = child, y, dx
+				if child.isLayout then
+					local x, y = child.x, child.y
+					local dx = math.abs(x - x0)
+					if y > y0 and y <= yMax and dx <= xMax then
+						selected, yMax, xMax = child, y, dx
+					end
 				end
 			end
 			actions.DOWN = nil
 		elseif code == "UP" then
 			for _,child in pairs(parent.__children) do
-				local x = child.isLayout and child.x or child:getX()
-				local y = child.isLayout and child.y or child:getY()
-				local dx = math.abs(x - x0)
-				if y < y0 and y >= yMin and dx <= xMax then
-					selected, yMin, xMax = child, y, dx
+				if child.isLayout then
+					local x, y = child.x, child.y
+					local dx = math.abs(x - x0)
+					if y < y0 and y >= yMin and dx <= xMax then
+						selected, yMin, xMax = child, y, dx
+					end
 				end
 			end
 			actions.UP = nil

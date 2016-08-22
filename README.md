@@ -372,8 +372,9 @@ onRemove = false, -- callback at removed from stage event, [false|function]
 onHover  = false, -- callback at mouse hovering, [false|function]
 onPress  = false, -- callback at LMB or touch press, [false|function]
 onHold   = false, -- callback at LMB or touch while hold, [false|function]
-onMove   = false, -- callback at layout moving
-onScroll = false, -- callback at layout scrolling
+onMove   = false, -- callback at layout moving, [false|function]
+onScroll = false, -- callback at layout scrolling, [false|function]
+onBack   = false, -- callback at "BACK" action, [false|function]
 
 -- built-in callbacks
 scroll = false, -- move children with mouse or touch, [false|true]

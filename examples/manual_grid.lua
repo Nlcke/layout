@@ -6,7 +6,7 @@ end
 local layout = Layout.new{
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
-	content = true, scroll = true,
+	scroll = true,
 	cols = 3, rows = 4,
 	borderW = 5, borderH = 5,
 	cellRelW = 1/3, cellRelH = 1/2,

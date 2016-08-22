@@ -1,6 +1,5 @@
 Slider = Layout:with{
 	scroll = true,
-	content = true,
 	bgrC = 0x444444,
 	bgrA = 0.5,
 	

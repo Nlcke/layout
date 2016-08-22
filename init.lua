@@ -1,4 +1,4 @@
-imagepath = "d:/Images/Fruits" -- set this path to your images
+imagepath = "images" -- set this path to your image folder
 backbuttonTexture = Texture.new("resources/backbutton.png")
 leftbuttonTexture = Texture.new("resources/leftbutton.png")
 rightbuttonTexture = Texture.new("resources/rightbutton.png")

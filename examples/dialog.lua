@@ -28,6 +28,7 @@ Dialog = Layout:with{
 		Cancel = function() print "Cancel" end
 	},
 	texture = skyworldTexture,
+	texM = Layout.STRETCH,
 	init = function(self, p)
 		self:addChild(Label.new{
 			text = self.text,
@@ -60,7 +61,6 @@ local label = Label.new{
 }
 
 local layout = Layout.new{
-	content = true,
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	bgrC = 0xFF0000, bgrA = 0.5,

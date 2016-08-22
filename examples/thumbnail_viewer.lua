@@ -16,7 +16,6 @@ if not textures then
 end
 
 local layout = Layout.new{
-	content = true,
 	cellRelW = 1/10, cellRelH = 1/10,
 	anRemove = Layout.newAnimation(),
 }

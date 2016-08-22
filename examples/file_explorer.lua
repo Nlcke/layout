@@ -81,6 +81,14 @@ Button = Layout:with{
 		layout:addChild(panel2)
 		panel1, panel2 = panel2, panel1
 		Layout.select(panel1)
+	end,
+	
+	onBack = function(self, parent)
+		if path == "" then
+			
+		else
+			self.onPress{text = ".."}
+		end
 	end
 }
 
@@ -89,7 +97,6 @@ panel1 = Layout.new{
 	database = database,
 	bringToFront = function() end,
 	scroll = true,
-	content = true,
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	cellAbsH = 50,
@@ -102,7 +109,6 @@ panel2 = Layout.new{
 	database = database,
 	bringToFront = function() end,
 	scroll = true,
-	content = true,
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	cellAbsH = 50,
