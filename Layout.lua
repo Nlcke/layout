@@ -161,9 +161,9 @@ local default = {
 	centerY = 0.5, -- [0..1]
 	
 	-- template grid
-	template    = false, -- Layout or Layout-based class
-	database    = false, -- list of cells' parameters
-	columnsFill = false, -- columns will be filled first if true
+	template = false, -- Layout or Layout-based class
+	database = false, -- list of cells' parameters
+	colsFill = false, -- columns will be filled first if true
 	
 	-- borders for cells
 	borderW = 0, -- cell border width in pixels
@@ -880,7 +880,7 @@ function Layout.__call(self, p, q)
 	if q then
 		if self.template then
 			local cols, rows = self:getGridSize()
-			local i = self.columnsFill and p*rows + q + 1 or q*cols + p + 1
+			local i = self.colsFill and p*rows + q + 1 or q*cols + p + 1
 			return self.database[i]
 		end
 		for i = 1, self:getNumChildren() do
@@ -1120,7 +1120,7 @@ function Layout:updateTemplateGrid()
 	for col = col0, colN do
 		for row = row0, rowN do
 			local n, i
-			if self.columnsFill then
+			if self.colsFill then
 				n = (col - col0) * urows + row - row0 + 1
 				i = col * rows + row + 1
 			else
@@ -1345,7 +1345,7 @@ end
 function Layout:selectCell(col, row)
 	local col0, row0 = self.selectedCol, self.selectedRow
 	local cols, rows = self:getGridSize()
-	local i = self.columnsFill and col*rows + row + 1 or row*cols + col + 1
+	local i = self.colsFill and col*rows + row + 1 or row*cols + col + 1
 	
 	if col < 0 or col > cols - 1 or row < 0 or row > rows - 1
 	or not self.database[i] then return end

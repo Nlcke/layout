@@ -177,7 +177,7 @@ for i = 1, 1000 * 1000 do
 end
 grid = Layout.new{
     template = Layout, database = database,
-    scroll = true, content = true,
+    scroll = true,
     cellAbsW = 200, cellAbsH = 50,
     cols = 1000, rows = 1000,
 }
@@ -240,9 +240,6 @@ relH = 1.0,
 limW = false, -- maximal width/height aspect ratio, [0..]
 limH = false, -- maximal height/width aspect ratio, [0..]
 
--- scrollable or movable content
-content = false, -- enables content size updates
-
 -- relative content size
 conRelW = 1, -- content width relative to parent, [false|number]
 conRelH = 1, -- content height relative to parent, [false|number]
@@ -283,9 +280,9 @@ centerX = 0.5, -- [0..1]
 centerY = 0.5, -- [0..1]
 
 -- template grid
-template    = false, -- Layout or Layout-based class
-database    = false, -- list of cells' parameters
-columnsFill = false, -- columns will be filled first if true
+template = false, -- Layout or Layout-based class
+database = false, -- list of cells' parameters
+colsFill = false, -- columns will be filled first if true
 
 -- borders for cells
 borderW = 0, -- cell border width
