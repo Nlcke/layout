@@ -14,7 +14,6 @@ local backbutton = Layout.new{
 	anHover = Layout.newAnimation(14, 7, 0.02),
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
-	
 	onPress = function(self)
 		for _,child in pairs(stage.__children) do
 			child:removeFromParent()
@@ -30,10 +29,11 @@ backbutton:addEventListener(Event.ENTER_FRAME, function()
 	end
 end)
 
-Button = Layout:with{
+local Button = Layout:with{
 	text = "BUTTON",
 	textColor = 0xFFFFFF,
 	bgrA = 1.0,
+	sprM = Layout.LETTERBOX,
 	
 	init = function(self, p)
 		self.textfield = TextField.new(font, self.text, "Pq|")
@@ -47,14 +47,14 @@ Button = Layout:with{
 	
 	anPress = Layout.newAnimation(14, 7, 0.04),
 	anHover = Layout.newAnimation(14, 7, 0.02),
-	selFillC = 0x0088FF, selFillA = 0.25,
+	
+	selector = Layout.new{bgrC = 0x0088FF, bgrA = 0.25},
 	
 	onPress = function(self)
 		stage:addChild(backbutton)
 		Layout.select(backbutton)
 		examples[self.text]()
 		layout:removeFromParent()
-		
 	end
 }
 
@@ -66,7 +66,7 @@ layout = Layout.new{
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	cellAbsH = 50,
-	borderW = 5, borderH = 5,
+	cellBrdW = 5, cellBrdH = 5,
 	cols = 1,
 }
 

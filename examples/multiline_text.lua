@@ -41,6 +41,7 @@ local layout = Layout.new{
 	anRemove = Layout.newAnimation(),
 	bgrC = 0x00BBFF, bgrA = 0.5,
 	cols = 1, rows = 4, cellRelW = 1, cellRelH = 0.25,
+	sprM = Layout.LETTERBOX,
 	newText(quotes[math.random(1, #quotes)])
 }
 

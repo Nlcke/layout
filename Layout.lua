@@ -89,59 +89,73 @@ rotation will be multiplied by 360 (1.0 = 360, -0.5 = -180, etc)
 Layout = Core.class(Mesh)
 
 -- scale modes for Layout.texM and Layout.sprM
-Layout.FIT_ALL    = 0
-Layout.STRETCH    = 1
-Layout.FIT_WIDTH  = 2
-Layout.FIT_HEIGHT = 3
-Layout.CROP       = 4
+Layout.NO_SCALE   = 0
+Layout.LETTERBOX  = 1
+Layout.STRETCH    = 2
+Layout.FIT_WIDTH  = 3
+Layout.FIT_HEIGHT = 4
+Layout.CROP       = 5
 
 -- default parameters for each new layout (can be modified)
 local default = {
 	-- anchored (to width and height of parent) positioning
-	ancX = 0.5, 
-	ancY = 0.5,
-	
+	ancX = 0.5, -- anchored X, [number]
+	ancY = 0.5, -- anchored Y, [number]
 	-- relative (to width and height of parent) positioning
-	relX = false,
-	relY = false,
-	
+	relX = false, -- relative X, [false|number]
+	relY = false, -- relative Y, [false|number]
 	-- absolute positioning (disables relative and anchored one)
-	absX = false, -- absolute X
-	absY = false, -- absolute Y
-	
-	-- absolute size (disables relative and anchored one)
-	absW = false,
-	absH = false,
+	absX = false, -- absolute X, [false|number]
+	absY = false, -- absolute X, [false|number]
 	
 	-- relative (to width and height of parent) size
 	relW = 1.0,
 	relH = 1.0,
-	
-	-- 	width/height restriction 
+	-- absolute size (disables relative and anchored one)
+	absW = false,
+	absH = false,
+	-- 	relative width/height restriction 
 	limW = false, -- maximal width/height aspect ratio, [0..]
 	limH = false, -- maximal height/width aspect ratio, [0..]
 	
 	-- relative content size
-	conRelW = 1, -- content width relative to parent, [false|number]
-	conRelH = 1, -- content height relative to parent, [false|number]
-	
+	conRelW = 1, -- content width relative to parent, [number]
+	conRelH = 1, -- content height relative to parent, [number]
 	-- absolute content size (disables relative width and/or height)
 	conAbsW = false, -- content absolute width (in pixels), [false|number]
 	conAbsH = false, -- content absolute height (in pixels), [false|number]
+	
+	-- template grid (template and database should be both enabled)
+	template = false, -- Layout or Layout-based class
+	database = false, -- list of cells' parameters
+	colsFill = false, -- columns will be filled first if true
+	
+	-- manual and template grid
+	cols = 0, -- grid cols number, [0..]
+	rows = 0, -- grid rows number, [0..]
+	cellBrdW = 0.0, -- cell border width in pixels
+	cellBrdH = 0.0, -- cell border height in pixels
+	cellRelW = 1.0, -- cell relative width for children layouts
+	cellRelH = 1.0, -- cell relative width for children layouts
+	cellAbsW = false, -- cell absolute width for children layouts
+	cellAbsH = false, -- cell absolute height for children layouts
+	
+	-- grid cell settings
+	col = false, -- cell column number, [number|false]
+	row = false, -- cell row number, [number|false]
+	cellW = 1.0, -- cell width relative modifier
+	cellH = 1.0, -- cell height relative modifier
+	
+	-- selector
+	selector = Layout.new{bgrA = 0.25}, -- [Layout]
 	
 	-- background
 	bgrC = 0x000000, -- background color
 	bgrA =      0.0, -- background alpha
 	
-	-- selector color settings
-	selLineC = 0x000000, -- selector line color
-	selLineA = 1.0,      -- selector line alpha
-	selFillC = 0x000000, -- selector fill color
-	selFillA = 0.1,      -- selector fill alpha
-	
 	-- texture
-	texture = false, -- texture object (from Texture.new)
-	texM = Layout.FIT_ALL, -- texture scale mode
+	texture = false, -- texture object, [Texture|false]
+	texM = Layout.LETTERBOX, -- texture scale mode, [number]
 	texC = 0xFFFFFF, -- texture color
 	texA = 1.0,      -- texture alpha
 	texS = 1.0,      -- texture scale
@@ -151,7 +165,7 @@ local default = {
 	texOffY = 0,     -- texture Y offset (in pixels)
 	
 	-- non-layout sprites
-	sprM = Layout.FIT_ALL, -- sprite scale mode
+	sprM = Layout.NO_SCALE, -- sprite scale mode, [number]
 	sprS = 1.0, -- sprite scale
 	sprX = 0.5, -- sprite X
 	sprY = 0.5, -- sprite Y
@@ -159,30 +173,6 @@ local default = {
 	-- relative center (affects rotation and scaling)
 	centerX = 0.5, -- [0..1]
 	centerY = 0.5, -- [0..1]
-	
-	-- template grid
-	template = false, -- Layout or Layout-based class
-	database = false, -- list of cells' parameters
-	colsFill = false, -- columns will be filled first if true
-	
-	-- borders for cells
-	borderW = 0, -- cell border width in pixels
-	borderH = 0, -- cell border height in pixels
-	
-	cols = 0, -- grid columns (integer) number, [0..]
-	rows = 0, -- grid rows (integer) number, [0..]
-	
-	cellRelW = 1, -- cell relative width
-	cellRelH = 1, -- cell relative width
-	
-	cellAbsW = false, -- cell absolute width
-	cellAbsH = false, -- cell absolute height
-	
-	-- cell
-	col  = false, -- cell column number (integer|false)
-	row  = false, -- cell row number (integer|false)
-	colW =   1.0, -- cell width relative to default cell width
-	rowH =   1.0, -- cell height relative to default cell height
 	
 	-- identification
 	id  = nil, -- to get child by id with 'layout(id)' call
@@ -301,8 +291,8 @@ local internal = {
 	parCellW = 0,
 	parCellH = 0,
 	
-	parBorderW = 0,
-	parBorderH = 0,
+	parcellBrdW = 0,
+	parcellBrdH = 0,
 	
 	selectedCol = 0,
 	selectedRow = 0,
@@ -399,7 +389,7 @@ function Layout:enterFrame(e)
 	if parent.isLayout then
 		if parent.w == 0 or parent.h == 0 then return end
 		self.parW, self.parH = parent.w, parent.h
-		self.parBorderW, self.parBorderH = parent.borderW, parent.borderH
+		self.parcellBrdW, self.parcellBrdH = parent.cellBrdW, parent.cellBrdH
 		self.parCellW = parent.cellAbsW or parent.cellRelW * parent.w
 		self.parCellH = parent.cellAbsH or parent.cellRelH * parent.h
 	elseif parent == stage then
@@ -812,9 +802,9 @@ function Layout:update(p)
 		self:updateColor(p.texC, p.texA, p.bgrC, p.bgrA)
 	end
 	
-	local w = self.col and self.parCellW * self.colW or self.absW or
+	local w = self.col and self.parCellW * self.cellW or self.absW or
 		self.relW * self.parW
-	local h = self.row and self.parCellH * self.rowH or self.absH or
+	local h = self.row and self.parCellH * self.cellH or self.absH or
 		self.relH * self.parH
 	
 	if self.limW and w / h > self.limW then w = self.limW * h end
@@ -828,9 +818,9 @@ function Layout:update(p)
 			local cols, rows = self:getGridSize()
 			local w = self.cellAbsW or self.cellRelW * self.w
 			local h = self.cellAbsH or self.cellRelH * self.h
-			local fw, fh = w + self.borderW, h + self.borderH
-			self.conW = fw * cols - self.borderW
-			self.conH = fh * rows - self.borderH
+			local fw, fh = w + self.cellBrdW, h + self.cellBrdH
+			self.conW = fw * cols - self.cellBrdW
+			self.conH = fh * rows - self.cellBrdH
 		else
 			if self.cols > 0 then
 				self.conW = (self.cellAbsW or self.cellRelW * self.w) * self.cols
@@ -852,9 +842,9 @@ function Layout:update(p)
 	local offX, offY = self.offX, self.offY
 	self:setClip(offX, offY, w, h)
 	
-	local x = self.col and (self.parCellW + self.parBorderW) * self.col or self.absX or
+	local x = self.col and (self.parCellW + self.parcellBrdW) * self.col or self.absX or
 		(self.relX and self.relX * self.parW or self.ancX * (self.parW - w))
-	local y = self.row and (self.parCellH + self.parBorderH) * self.row or self.absY or
+	local y = self.row and (self.parCellH + self.parcellBrdH) * self.row or self.absY or
 		(self.relY and self.relY * self.parH or self.ancY * (self.parH - h))
 	
 	local ax, ay = self.centerX * w, self.centerY * h
@@ -866,8 +856,9 @@ function Layout:update(p)
 	self.x, self.y = x, y
 	self.backup.x, self.backup.y = rx / w, ry / h
 	
-	if self == Layout.selected then
-		Layout.selector:setSize(self.w, self.h)
+	if self == Layout.selector then
+		local p = self.__parent
+		if p then Layout.selector:setPosition(p.offX + ax, p.offY + ay) end
 	end
 	
 	if self.texture then self:updateTexture(self.texture) end
@@ -1023,21 +1014,24 @@ function Layout:updateTexture(texture)
 	local tw0, th0 = texture:getWidth(), texture:getHeight()
 	local tw, th = tw0 / self.texS, th0 / self.texS
 	local w, h = nil, nil
+	local m = self.texM
 	
-	if     self.texM == Layout.FIT_ALL then
+	if m == Layout.NO_SCALE then
+		w, h = pw / self.texS, ph / self.texS
+	elseif m == Layout.LETTERBOX then
 		local s = math.max(tw / pw, th / ph)
 		w, h = s * pw, s * ph
-	elseif self.texM == Layout.STRETCH then
+	elseif m == Layout.STRETCH then
 		w, h = tw, th
-	elseif self.texM == Layout.FIT_WIDTH then
+	elseif m == Layout.FIT_WIDTH then
 		w, h = tw, ph * th / pw
-	elseif self.texM == Layout.FIT_HEIGHT then
+	elseif m == Layout.FIT_HEIGHT then
 		w, h = pw * tw / ph , th
-	elseif self.texM == Layout.CROP then
+	elseif m == Layout.CROP then
 		local s = math.min(tw / pw, th / ph)
 		w, h = s * pw, s * ph
 	else
-		error("texture mode '" .. tostring(self.texM) .. "' not found")
+		error("texture mode '" .. tostring(m) .. "' not found")
 	end
 	
 	local x = self.texAncX*(tw0 - w) + self.texOffX
@@ -1047,32 +1041,32 @@ end
 
 function Layout:updateSprite(sprite)
 	local pw, ph = self.w, self.h
-	
 	if sprite.onResize then return sprite:onResize(pw, ph) end
+	local m = self.sprM
+	if m == Layout.NO_SCALE then return end
 
 	sprite:setPosition(0, 0)
 	sprite:setScale(1.0)
 	
 	local w = sprite:getWidth()
-	local isText = getmetatable(sprite).getSample
-	local h = isText and sprite:getLineHeight() or sprite:getHeight()
+	local h = sprite.getLineHeight and sprite:getLineHeight() or sprite:getHeight()
 	
-	if     self.sprM == Layout.FIT_ALL then
+	if     m == Layout.LETTERBOX then
 		sprite:setScale(self.sprS * math.min(pw / w, ph / h))
-	elseif self.sprM == Layout.STRETCH then
+	elseif m == Layout.STRETCH then
 		sprite:setScale(self.sprS * pw / w, self.sprS * ph / h)
-	elseif self.sprM == Layout.FIT_WIDTH then
+	elseif m == Layout.FIT_WIDTH then
 		sprite:setScale(self.sprS * pw / w)
-	elseif self.sprM == Layout.FIT_HEIGHT then
+	elseif m == Layout.FIT_HEIGHT then
 		sprite:setScale(self.sprS * ph / h)
-	elseif self.sprM == Layout.CROP then
+	elseif m == Layout.CROP then
 		sprite:setScale(self.sprS * math.max(pw / w, ph / h))
 	else
-		error("sprite mode '" .. tostring(self.sprM) .. "' not found")
+		error("sprite mode '" .. tostring(m) .. "' not found")
 	end
 	
 	local w = sprite:getWidth()
-	local h = isText and sprite:getScale() * h or sprite:getHeight()
+	local h = sprite:getScaleY() * h
 	sprite:setPosition(self.sprX * (pw - w), self.sprY * (ph - h))
 end
 
@@ -1099,7 +1093,7 @@ function Layout:updateTemplateGrid()
 	
 	local w = self.cellAbsW or self.cellRelW * self.w
 	local h = self.cellAbsH or self.cellRelH * self.h
-	local fw, fh = w + self.borderW, h + self.borderH
+	local fw, fh = w + self.cellBrdW, h + self.cellBrdH
 	
 	local vcols = math.min(cols, math.ceil(self.w / fw) + 1)
 	local vrows = math.min(rows, math.ceil(self.h / fh) + 1)
@@ -1304,48 +1298,19 @@ end
 
 -- SELECTOR --
 
-function Layout.newSelector(w, h, lc, la, fc, fa)
-	w, h = w or 0, h or 0
-	lc, la = lc or Layout.selLineC, la or Layout.selLineA
-	fc, fa = fc or Layout.selFillC, fa or Layout.selFillA
-	local self = Path2D.new()
-	self.setSize = function(self, w, h)
-		w, h = w - 1, h - 1
-		self:setSvgPath(string.format("M 1 1 L %s 1 L %s %s L 1 %s Z",
-			w, w, h, h))
-	end
-	self:setSize(w, h)
-	self:setConvex()
-	self:setLineColor(lc, la)
-	self:setFillColor(fc, fa)
-	self.isLayout = true
-	return self
-end
+Layout.selector = Layout.new{bgrA = 0.25}
 
 function Layout:select()
 	self = self or stage
-	Layout.selected = self
+	Layout.selected = self or stage
 	Sprite.removeFromParent(Layout.selector)
-	if self == stage then return end
-	if self.isLayout then
-		local parent = self.parent
-		if parent and parent.template then
-			parent.selectedCol, parent.selectedRow = self.col, self.row
-		end
-		Layout.selector:setSize(self.w, self.h)
-		Layout.selector:setLineColor(self.selLineC, self.selLineA)
-		Layout.selector:setFillColor(self.selFillC, self.selFillA)
-		Layout.selector:setPosition(self.offX, self.offY)
-	else
-		local sx, sy = self:getScale()
-		Layout.selector:setSize(self:getWidth()/sx, self:getHeight()/sy)
-		Layout.selector:setLineColor(Layout.selLineC, Layout.selLineA)
-		Layout.selector:setFillColor(Layout.selFillC, Layout.selFillA)
-		Layout.selector:setPosition(0, 0)
+	if not self.isLayout then return end
+	local parent = self.parent
+	if parent and parent.template then
+		parent.selectedCol, parent.selectedRow = self.col, self.row
 	end
-	self:addChild(Layout.selector)
+	self:addChild(self.selector)
 end
-
 
 function Layout:selectCell(col, row)
 	local col0, row0 = self.selectedCol, self.selectedRow
@@ -1370,15 +1335,15 @@ function Layout:selectCell(col, row)
 	
 	local w = self.cellAbsW or self.cellRelW * self.w
 	local h = self.cellAbsH or self.cellRelH * self.h
-	local fw, fh = w + self.borderW, h + self.borderH
+	local fw, fh = w + self.cellBrdW, h + self.cellBrdH
 	
 	local px1, py1 = self.offX, self.offY
 	local px2, py2 = px1 + self.w, py1 + self.h
 	local cx1, cy1 = fw * col, fh * row
 	local cx2, cy2 = cx1 + fw, cy1 + fh
 	
-	if col == cols - 1 then cx2 = cx2 - self.borderW end
-	if row == rows - 1 then cy2 = cy2 - self.borderH end
+	if col == cols - 1 then cx2 = cx2 - self.cellBrdW end
+	if row == rows - 1 then cy2 = cy2 - self.cellBrdH end
 	
 	local t = {}
 	if cx1 < px1 then t.offX = cx1
@@ -1399,13 +1364,15 @@ function Layout:selectCell(col, row)
 	end
 end
 
-Layout.selector = Layout.newSelector()
-
-Layout.selected = stage
-
 -- KEYBOARD AND GAMEPAD EVENTS
 
 local actions = {}
+
+local function isOpeningOrEnding(self)
+	if self.isLayout and self.frame < self.frames
+	and self.mark <= 0 then return true end
+	if self.__parent then return isOpeningOrEnding(self.__parent) end
+end
 
 local function select()
 	local selected = Layout.selected
@@ -1443,12 +1410,13 @@ if pcall(require, "controller") then
 	
 	controller:addEventListener(Event.KEY_UP, function(e)
 		--print("BUTTON RELEASED:", e.keyCode)
-		local buttons = Layout.selected.isLayout and
-			Layout.selected.buttons or Layout.buttons
+		local selected = Layout.selected
+		local buttons = selected.isLayout and selected.buttons or Layout.buttons
 		local code = buttons[e.keyCode]
 		if code then
 			actions[code] = nil
-			Layout.selected.event = Layout.IDLE
+			if isOpeningOrEnding(selected) then return end
+			selected.event = Layout.IDLE
 			if code == "SELECT" then select() end
 		end
 	end)
@@ -1491,12 +1459,13 @@ end)
 
 stage:addEventListener(Event.KEY_UP, function(e)
 	--print("KEY RELEASED:", e.realCode)
-	local keys = Layout.selected.isLayout and
-		Layout.selected.keys or Layout.keys
+	local selected = Layout.selected
+	local keys = selected.isLayout and selected.keys or Layout.keys
 	local code = keys[e.realCode]
 	if code then
 		actions[code] = nil
-		Layout.selected.event = Layout.IDLE
+		if isOpeningOrEnding(selected) then return end
+		selected.event = Layout.IDLE
 		if code == "SELECT" then select() end
 	end
 end)
@@ -1515,6 +1484,7 @@ function Layout.onKeyOrButton(code)
 	local parent = selected.__parent
 	if code == "SELECT" then
 		actions.SELECT = nil
+		if isOpeningOrEnding(selected) then return end
 		if selected.isLayout and (selected.onPress or selected.anPress) then
 			local event = selected.event
 			selected.event = Layout.PRESS_HOLD

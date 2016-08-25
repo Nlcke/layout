@@ -32,10 +32,11 @@ local callback = print
 
 local layout, panel1, panel2
 
-Button = Layout:with{
-	text = "BUTTON",
+local Button = Layout:with{
+	text = "",
 	textColor = 0xFFFFFF,
 	bgrC = 0x0088AA, bgrA = 1.0,
+	sprM = Layout.LETTERBOX,
 	
 	init = function(self, p)
 		self.textfield = TextField.new(font, self.text, "|")
@@ -100,7 +101,7 @@ panel1 = Layout.new{
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	cellAbsH = 50,
-	borderW = 5, borderH = 5,
+	cellBrdW = 5, cellBrdH = 5,
 	cols = 1,
 }
 
@@ -112,7 +113,7 @@ panel2 = Layout.new{
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	cellAbsH = 50,
-	borderW = 5, borderH = 5,
+	cellBrdW = 5, cellBrdH = 5,
 	cols = 1,
 }
 

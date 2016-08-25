@@ -217,60 +217,73 @@ local animation1 = Layout.newAnimation(20, -1, 0.3, 343234234)
 ### <a name = "layout-keys">Layout Keys</a>
 ```lua
 -- anchored (to width and height of parent) positioning
-ancX = 0.5, 
-ancY = 0.5,
-
+ancX = 0.5, -- anchored X, [number]
+ancY = 0.5, -- anchored Y, [number]
 -- relative (to width and height of parent) positioning
-relX = false,
-relY = false,
-
+relX = false, -- relative X, [false|number]
+relY = false, -- relative Y, [false|number]
 -- absolute positioning (disables relative and anchored one)
-absX = false, -- absolute X
-absY = false, -- absolute Y
-
--- absolute size (disables relative and anchored one)
-absW = false,
-absH = false,
+absX = false, -- absolute X, [false|number]
+absY = false, -- absolute X, [false|number]
 
 -- relative (to width and height of parent) size
 relW = 1.0,
 relH = 1.0,
-
--- 	width/height restriction 
+-- absolute size (disables relative and anchored one)
+absW = false,
+absH = false,
+-- 	relative width/height restriction 
 limW = false, -- maximal width/height aspect ratio, [0..]
 limH = false, -- maximal height/width aspect ratio, [0..]
 
 -- relative content size
-conRelW = 1, -- content width relative to parent, [false|number]
-conRelH = 1, -- content height relative to parent, [false|number]
-
+conRelW = 1, -- content width relative to parent, [number]
+conRelH = 1, -- content height relative to parent, [number]
 -- absolute content size (disables relative width and/or height)
 conAbsW = false, -- content absolute width (in pixels), [false|number]
 conAbsH = false, -- content absolute height (in pixels), [false|number]
+
+-- template grid (template and database should be both enabled)
+template = false, -- Layout or Layout-based class
+database = false, -- list of cells' parameters
+colsFill = false, -- columns will be filled first if true
+
+-- manual and template grid
+cols = 0, -- grid cols number, [0..]
+rows = 0, -- grid rows number, [0..]
+cellBrdW = 0.0, -- cell border width in pixels
+cellBrdH = 0.0, -- cell border height in pixels
+cellRelW = 1.0, -- cell relative width for children layouts
+cellRelH = 1.0, -- cell relative width for children layouts
+cellAbsW = false, -- cell absolute width for children layouts
+cellAbsH = false, -- cell absolute height for children layouts
+
+-- grid cell settings
+col = false, -- cell column number, [number|false]
+row = false, -- cell row number, [number|false]
+cellW = 1.0, -- cell width relative modifier
+cellH = 1.0, -- cell height relative modifier
+
+-- selector
+selector = Layout.new{bgrA = 0.25}, -- [Layout]
 
 -- background
 bgrC = 0x000000, -- background color
 bgrA =      0.0, -- background alpha
 
--- selector color settings
-selLineC = 0x000000, -- selector line color
-selLineA = 1.0,      -- selector line alpha
-selFillC = 0x000000, -- selector fill color
-selFillA = 0.1,      -- selector fill alpha
-
 -- texture
-texture = false, -- texture object (from Texture.new)
-texM = Layout.FIT_ALL, -- texture scale mode
+texture = false, -- texture object, [Texture|false]
+texM = Layout.LETTERBOX, -- texture scale mode, [number]
 texC = 0xFFFFFF, -- texture color
-texA = 1.0, -- texture alpha
-texS = 1.0, -- texture scale
+texA = 1.0,      -- texture alpha
+texS = 1.0,      -- texture scale
 texAncX = 0.5,   -- texture anchored X, [0..1]
 texAncY = 0.5,   -- texture anchored Y, [0..1]
 texOffX = 0,     -- texture X offset (in pixels)
 texOffY = 0,     -- texture Y offset (in pixels)
 
 -- non-layout sprites
-sprM = Layout.FIT_ALL, -- sprite scale mode
+sprM = Layout.NO_SCALE, -- sprite scale mode, [number]
 sprS = 1.0, -- sprite scale
 sprX = 0.5, -- sprite X
 sprY = 0.5, -- sprite Y
@@ -278,30 +291,6 @@ sprY = 0.5, -- sprite Y
 -- relative center (affects rotation and scaling)
 centerX = 0.5, -- [0..1]
 centerY = 0.5, -- [0..1]
-
--- template grid
-template = false, -- Layout or Layout-based class
-database = false, -- list of cells' parameters
-colsFill = false, -- columns will be filled first if true
-
--- borders for cells
-borderW = 0, -- cell border width
-borderH = 0, -- cell border height
-
-cols = 0, -- grid columns (integer) number, [0..]
-rows = 0, -- grid rows (integer) number, [0..]
-
-cellRelW = 1, -- cell relative width
-cellRelH = 1, -- cell relative width
-
-cellAbsW = false, -- cell absolute width
-cellAbsH = false, -- cell absolute height
-
--- cell
-col  = false, -- cell column number (integer|false)
-row  = false, -- cell row number (integer|false)
-colW =   1.0, -- cell width relative to default cell width
-rowH =   1.0, -- cell height relative to default cell height
 
 -- identification
 id  = nil, -- to get child by id with 'layout(id)' call
@@ -332,7 +321,7 @@ buttons = { -- [keyCode] = action
 	[21]  =     "UP",
 	[22]  =   "DOWN",
 	[105] =  "RIGHT",
-	--[???] = "LEFT", -- controller plugin is broken (only on Windows?)
+	--[???] = "LEFT", -- controller plugin is broken for desktop
 	[96]  = "SELECT",
 	[97]  =   "BACK",
 	
@@ -383,7 +372,7 @@ tilt   = false, -- tilt layout with RMB or double touch, [false|true]
 anAdd    = false, -- opening animation (mark=0)
 anRemove = false, -- ending animation (mark=-1)
 anPress  = false, -- press animation (mark>0)
-anHover  = false, -- hover animation (mark>0) 
+anHover  = false, -- hover animation (mark>0)
 ```
 
 ### <a name = "resource-loader-api">Resource Loader API</a>

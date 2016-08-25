@@ -2,6 +2,8 @@ Label = Layout:with{
 	text = "LABEL",
 	textColor = 0xFFFFFF,
 	bgrA = 1.0,
+	sprM = Layout.LETTERBOX,
+	sprS = 0.9,
 	
 	init = function(self, p)
 		self.textfield = TextField.new(font, self.text, "|")
@@ -14,13 +16,13 @@ Label = Layout:with{
 	end,
 }
 
-Button = Label:with{
+local Button = Label:with{
 	text = "BUTTON",
 	anPress = Layout.newAnimation(14, 7, 0.04),
 	anHover = Layout.newAnimation(14, 7, 0.02),
 }
 
-Dialog = Layout:with{
+local Dialog = Layout:with{
 	text = "DIALOG",
 	buttons = {"OK", "Cancel"},
 	callbacks = {

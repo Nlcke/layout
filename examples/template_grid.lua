@@ -4,6 +4,7 @@ Button = Layout:with{
 	absX = 0, absY = 0,
 	bgrC = 0x0088AA,
 	bgrA = 1.0,
+	sprM = Layout.LETTERBOX,
 	
 	init = function(self, p)
 		self.textfield = TextField.new(font, self.text, "|")
@@ -15,6 +16,12 @@ Button = Layout:with{
 		if p.text then self.textfield:setText(p.text) end
 	end,
 	
+	selector = Layout.new{
+		texture = rightbuttonTexture,
+		texA = 0.5, texAncX = 0,
+		anAdd = {frames = 10, scaleX = math.sin}
+	},
+	anAdd = Layout.newAnimation(),
 	anPress = Layout.newAnimation(14, 7, 0.04),
 	anHover = Layout.newAnimation(14, 7, 0.02),
 	
@@ -29,10 +36,9 @@ local layout = Layout.new{
 	template = Button, database = database,
 	colsFill = true,
 	scroll = true,
-	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	cellAbsW = 200, cellAbsH = 50,
-	borderW = 5, borderH = 5,
+	cellBrdW = 5, cellBrdH = 5,
 	cols = 1000, rows = 0,
 }
 
