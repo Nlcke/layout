@@ -23,14 +23,15 @@ local thisImage = Layout.new{
 
 local nextImage = Layout.new{}
 
-local imageframe = Layout.new{thisImage}
+local imageframe = Layout.new{thisImage, selectable = false}
 
 local label = Layout.new{
 	relW = 0.8, relH = 0.1,
 	relX = 0.1, relY = 0.9,
 	sprM = Layout.FIT_HEIGHT,
-	sprX = 1,
+	sprAncX = 1,
 	bgrA = 0.5,
+	selectable = false,
 	TextField.new(font, texturenames[i], "|")
 }
 

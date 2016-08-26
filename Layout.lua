@@ -150,34 +150,37 @@ local default = {
 	
 	-- selector
 	selector = Layout.new{bgrA = 0.25}, -- [Layout]
+	selectable = true, -- can be selected by keyboard/joystick, [true|false]
 	
 	-- background
-	bgrC = 0x000000, -- background color
-	bgrA =      0.0, -- background alpha
+	bgrC = 0x000000, -- background color, [0x000000..0xFFFFFF]
+	bgrA =      0.0, -- background alpha, [0..1]
 	
 	-- texture
 	texture = false, -- texture object, [Texture|false]
-	texM = 1, -- texture scale mode (default: LETTERBOX), [number]
-	texC = 0xFFFFFF, -- texture color
-	texA = 1.0,      -- texture alpha
-	texS = 1.0,      -- texture scale
+	texC = 0xFFFFFF, -- texture color, [0x000000..0xFFFFFF]
+	texA    = 1.0,      -- texture alpha, [0..1]
+	texM    =   1, -- texture scale mode (default: LETTERBOX), [number]
+	texS    = 1.0,   -- texture scale, [number]
 	texAncX = 0.5,   -- texture anchored X, [0..1]
 	texAncY = 0.5,   -- texture anchored Y, [0..1]
-	texOffX = 0,     -- texture X offset (in pixels)
-	texOffY = 0,     -- texture Y offset (in pixels)
+	texOffX = 0.0,   -- texture X offset (in pixels)
+	texOffY = 0.0,   -- texture Y offset (in pixels)
 	
-	-- non-layout sprites
-	sprM = 1, -- sprite scale mode (default: LETTERBOX), [number]
-	sprS = 1.0, -- sprite scale
-	sprX = 0.5, -- sprite X
-	sprY = 0.5, -- sprite Y
+	-- non-layout children sprites
+	sprM    =   1, -- sprite scale mode (default: LETTERBOX), [number]
+	sprS    = 1.0,   -- sprite scale
+	sprAncX = 0.5, -- sprite anchored X, [0..1]
+	sprAncY = 0.5, -- sprite anchored Y, [0..1]
+	sprOffX = 0.0, -- sprite X offset (in pixels)
+	sprOffY = 0.0, -- sprite Y offset (in pixels)
 	
 	-- relative center (affects rotation and scaling)
 	centerX = 0.5, -- [0..1]
 	centerY = 0.5, -- [0..1]
 	
 	-- identification
-	id  = false, -- to get child by id with 'layout(id)' call
+	id = false, -- to get child by id with 'layout(id)' call
 	
 	-- inheritance
 	init = false, -- callback at instantiation (useful for custom classes)
@@ -1170,7 +1173,8 @@ function Layout:updateSprite(sprite)
 	
 	local w = sprite:getWidth()
 	local h = sprite:getScaleY() * h
-	sprite:setPosition(self.sprX * (pw - w), self.sprY * (ph - h))
+	sprite:setPosition(self.sprAncX * (pw - w) + self.sprOffX,
+		self.sprAncY * (ph - h) + self.sprOffY)
 end
 
 function Layout:getGridSize()
@@ -1630,7 +1634,7 @@ function Layout.onKeyOrButton(code)
 		local yMin, yMax = -math.huge, math.huge
 		if code == "RIGHT" then
 			for _,child in pairs(parent.__children) do
-				if child.isLayout then
+				if child.isLayout and child.selectable then
 					local x, y = child.x, child.y
 					local dy = math.abs(y - y0)
 					if x > x0 and x <= xMax and dy <= yMax then
@@ -1641,7 +1645,7 @@ function Layout.onKeyOrButton(code)
 			actions.RIGHT = nil
 		elseif code == "LEFT" then
 			for _,child in pairs(parent.__children) do
-				if child.isLayout then
+				if child.isLayout and child.selectable then
 					local x, y = child.x, child.y
 					local dy = math.abs(y - y0)
 					if x < x0 and x >= xMin and dy <= yMax then
@@ -1652,7 +1656,7 @@ function Layout.onKeyOrButton(code)
 			actions.LEFT = nil
 		elseif code == "DOWN" then
 			for _,child in pairs(parent.__children) do
-				if child.isLayout then
+				if child.isLayout and child.selectable then
 					local x, y = child.x, child.y
 					local dx = math.abs(x - x0)
 					if y > y0 and y <= yMax and dx <= xMax then
@@ -1663,7 +1667,7 @@ function Layout.onKeyOrButton(code)
 			actions.DOWN = nil
 		elseif code == "UP" then
 			for _,child in pairs(parent.__children) do
-				if child.isLayout then
+				if child.isLayout and child.selectable then
 					local x, y = child.x, child.y
 					local dx = math.abs(x - x0)
 					if y < y0 and y >= yMin and dx <= xMax then

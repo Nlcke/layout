@@ -16,7 +16,7 @@ Slider = Layout:with{
 	init = function(self, p)
 		self.indicator = Layout.new{
 			sprM = Layout.FIT_HEIGHT,
-			sprX = 0,
+			sprAncX = 0,
 			TextField.new(font, "0", "fg|")
 		}
 		self:addChild(self.indicator)

@@ -283,34 +283,37 @@ cellH = 1.0, -- cell height relative modifier
 
 -- selector
 selector = Layout.new{bgrA = 0.25}, -- [Layout]
+selectable = true, -- can be selected by keyboard/joystick, [true|false]
 
 -- background
-bgrC = 0x000000, -- background color
-bgrA =      0.0, -- background alpha
+bgrC = 0x000000, -- background color, [0x000000..0xFFFFFF]
+bgrA =      0.0, -- background alpha, [0..1]
 
 -- texture
 texture = false, -- texture object, [Texture|false]
-texM = 1, -- texture scale mode, [number]
-texC = 0xFFFFFF, -- texture color
-texA = 1.0,      -- texture alpha
-texS = 1.0,      -- texture scale
+texC = 0xFFFFFF, -- texture color, [0x000000..0xFFFFFF]
+texA    = 1.0,      -- texture alpha, [0..1]
+texM    =   1, -- texture scale mode (default: LETTERBOX), [number]
+texS    = 1.0,   -- texture scale, [number]
 texAncX = 0.5,   -- texture anchored X, [0..1]
 texAncY = 0.5,   -- texture anchored Y, [0..1]
-texOffX = 0,     -- texture X offset (in pixels)
-texOffY = 0,     -- texture Y offset (in pixels)
+texOffX = 0.0,   -- texture X offset (in pixels)
+texOffY = 0.0,   -- texture Y offset (in pixels)
 
--- non-layout sprites
-sprM = 0, -- sprite scale mode, [number]
-sprS = 1.0, -- sprite scale
-sprX = 0.5, -- sprite X
-sprY = 0.5, -- sprite Y
+-- non-layout children sprites
+sprM    =   1, -- sprite scale mode (default: LETTERBOX), [number]
+sprS    = 1.0,   -- sprite scale
+sprAncX = 0.5, -- sprite anchored X, [0..1]
+sprAncY = 0.5, -- sprite anchored Y, [0..1]
+sprOffX = 0.0, -- sprite X offset (in pixels)
+sprOffY = 0.0, -- sprite Y offset (in pixels)
 
 -- relative center (affects rotation and scaling)
 centerX = 0.5, -- [0..1]
 centerY = 0.5, -- [0..1]
 
 -- identification
-id  = false, -- to get child by id with 'layout(id)' call
+id = false, -- to get child by id with 'layout(id)' call
 
 -- inheritance
 init = false, -- callback at instantiation (useful for custom classes)
@@ -389,7 +392,7 @@ tilt   = false, -- tilt layout with RMB or double touch, [false|true]
 anAdd    = false, -- opening animation (mark=0)
 anRemove = false, -- ending animation (mark=-1)
 anPress  = false, -- press animation (mark>0)
-anHover  = false, -- hover animation (mark>0) 
+anHover  = false, -- hover animation (mark>0)
 ```
 
 ### <a name = "resource-loader-api">Resource Loader API</a>
