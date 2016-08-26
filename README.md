@@ -216,6 +216,14 @@ local animation1 = Layout.newAnimation(20, -1, 0.3, 343234234)
 ```
 ### <a name = "layout-keys">Layout Keys</a>
 ```lua
+-- scale modes for Layout.texM and Layout.sprM
+NO_SCALE   = 0,
+LETTERBOX  = 1,
+STRETCH    = 2,
+FIT_WIDTH  = 3,
+FIT_HEIGHT = 4,
+CROP       = 5,
+
 -- anchored (to width and height of parent) positioning
 ancX = 0.5, -- anchored X, [number]
 ancY = 0.5, -- anchored Y, [number]
@@ -273,7 +281,7 @@ bgrA =      0.0, -- background alpha
 
 -- texture
 texture = false, -- texture object, [Texture|false]
-texM = Layout.LETTERBOX, -- texture scale mode, [number]
+texM = 1, -- texture scale mode, [number]
 texC = 0xFFFFFF, -- texture color
 texA = 1.0,      -- texture alpha
 texS = 1.0,      -- texture scale
@@ -283,7 +291,7 @@ texOffX = 0,     -- texture X offset (in pixels)
 texOffY = 0,     -- texture Y offset (in pixels)
 
 -- non-layout sprites
-sprM = Layout.NO_SCALE, -- sprite scale mode, [number]
+sprM = 0, -- sprite scale mode, [number]
 sprS = 1.0, -- sprite scale
 sprX = 0.5, -- sprite X
 sprY = 0.5, -- sprite Y
@@ -293,7 +301,7 @@ centerX = 0.5, -- [0..1]
 centerY = 0.5, -- [0..1]
 
 -- identification
-id  = nil, -- to get child by id with 'layout(id)' call
+id  = false, -- to get child by id with 'layout(id)' call
 
 -- inheritance
 init = false, -- callback at instantiation (useful for custom classes)
@@ -372,7 +380,7 @@ tilt   = false, -- tilt layout with RMB or double touch, [false|true]
 anAdd    = false, -- opening animation (mark=0)
 anRemove = false, -- ending animation (mark=-1)
 anPress  = false, -- press animation (mark>0)
-anHover  = false, -- hover animation (mark>0)
+anHover  = false, -- hover animation (mark>0) 
 ```
 
 ### <a name = "resource-loader-api">Resource Loader API</a>

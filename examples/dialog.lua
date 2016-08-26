@@ -2,7 +2,6 @@ Label = Layout:with{
 	text = "LABEL",
 	textColor = 0xFFFFFF,
 	bgrA = 1.0,
-	sprM = Layout.LETTERBOX,
 	sprS = 0.9,
 	
 	init = function(self, p)

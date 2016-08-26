@@ -4,11 +4,11 @@ local Sticker = Layout:with{
 	text = "",
 	init = function(self)
 		local a, b, c = self.text:match"(.+\n)(.+\n)(.+)"
-		self:addChild(Layout.new{sprM = Layout.LETTERBOX, sprS = 0.9,
+		self:addChild(Layout.new{sprS = 0.9,
 			relH = 1/3, relY = 0/3, TextField.new(font, a, "|")})
-		self:addChild(Layout.new{sprM = Layout.LETTERBOX, sprS = 0.9,
+		self:addChild(Layout.new{sprS = 0.9,
 			relH = 1/3, relY = 1/3, TextField.new(font, b, "|")})
-		self:addChild(Layout.new{sprM = Layout.LETTERBOX, sprS = 0.9,
+		self:addChild(Layout.new{sprS = 0.9,
 			relH = 1/3, relY = 2/3, TextField.new(font, c, "|")})
 	end
 }

@@ -34,8 +34,7 @@ end
 local layout = Layout.new{
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
-	onPress = onPress
-
+	onPress = onPress,
 }
 
 onPress(layout)

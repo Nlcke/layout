@@ -33,7 +33,6 @@ local Button = Layout:with{
 	text = "BUTTON",
 	textColor = 0xFFFFFF,
 	bgrA = 1.0,
-	sprM = Layout.LETTERBOX,
 	
 	init = function(self, p)
 		self.textfield = TextField.new(font, self.text, "Pq|")

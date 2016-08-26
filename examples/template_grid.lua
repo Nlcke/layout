@@ -4,7 +4,6 @@ Button = Layout:with{
 	absX = 0, absY = 0,
 	bgrC = 0x0088AA,
 	bgrA = 1.0,
-	sprM = Layout.LETTERBOX,
 	
 	init = function(self, p)
 		self.textfield = TextField.new(font, self.text, "|")

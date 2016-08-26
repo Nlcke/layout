@@ -12,9 +12,11 @@ Layout:play(anim, [newstate], [callback])
 	-- plays animation, see description at Animation section
 	-- newstate is a table with numeric parameters of layout
 	-- callback is a function which will be called at the end of animation
-Layout:with{...}
+Layout:with(p) or Layout:with(old, new)
+	-- accepts one or two tables
+	-- if 'old' and 'new' tables used then keys will be checked
 	-- extend Layout class (or subclass) with additional parameters
-	-- 'init' and 'upd' functions will be inherited from all parents
+	-- 'init' and 'upd' functions are inherited from all parents
 	-- resulting class can be instantiated (new) or extended (with)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Resource Loader ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,16 +90,16 @@ rotation will be multiplied by 360 (1.0 = 360, -0.5 = -180, etc)
 
 Layout = Core.class(Mesh)
 
--- scale modes for Layout.texM and Layout.sprM
-Layout.NO_SCALE   = 0
-Layout.LETTERBOX  = 1
-Layout.STRETCH    = 2
-Layout.FIT_WIDTH  = 3
-Layout.FIT_HEIGHT = 4
-Layout.CROP       = 5
-
 -- default parameters for each new layout (can be modified)
 local default = {
+	-- scale modes for Layout.texM and Layout.sprM
+	NO_SCALE   = 0,
+	LETTERBOX  = 1,
+	STRETCH    = 2,
+	FIT_WIDTH  = 3,
+	FIT_HEIGHT = 4,
+	CROP       = 5,
+	
 	-- anchored (to width and height of parent) positioning
 	ancX = 0.5, -- anchored X, [number]
 	ancY = 0.5, -- anchored Y, [number]
@@ -155,7 +157,7 @@ local default = {
 	
 	-- texture
 	texture = false, -- texture object, [Texture|false]
-	texM = Layout.LETTERBOX, -- texture scale mode, [number]
+	texM = 1, -- texture scale mode (default: LETTERBOX), [number]
 	texC = 0xFFFFFF, -- texture color
 	texA = 1.0,      -- texture alpha
 	texS = 1.0,      -- texture scale
@@ -165,7 +167,7 @@ local default = {
 	texOffY = 0,     -- texture Y offset (in pixels)
 	
 	-- non-layout sprites
-	sprM = Layout.NO_SCALE, -- sprite scale mode, [number]
+	sprM = 1, -- sprite scale mode (default: LETTERBOX), [number]
 	sprS = 1.0, -- sprite scale
 	sprX = 0.5, -- sprite X
 	sprY = 0.5, -- sprite Y
@@ -175,7 +177,7 @@ local default = {
 	centerY = 0.5, -- [0..1]
 	
 	-- identification
-	id  = nil, -- to get child by id with 'layout(id)' call
+	id  = false, -- to get child by id with 'layout(id)' call
 	
 	-- inheritance
 	init = false, -- callback at instantiation (useful for custom classes)
@@ -260,10 +262,20 @@ local default = {
 for k,v in pairs(default) do Layout[k] = v end
 
 local internal = {
+	-- identification
 	isLayout = true,
 	getClass = function() return "Layout" end,
 	
-	-- events
+	-- inheritance
+	with = false,
+	
+	-- to check if event is mouse move event
+	isMouseMove = false,
+	
+	-- to check if parent changed
+	parent = false,
+	
+	-- event types
 	IDLE        = 0,
 	HOVER       = 1,
 	PRESS_HOLD  = 2,
@@ -273,58 +285,143 @@ local internal = {
 	REMOVE      = 6,
 	PLAY        = 7,
 	
-	event = 0, -- IDLE
+	event = 0,
 	onPlay = false,
 	
-	isMouseMove = false,
-	
-	parent = false,
-	
+	-- position and size
 	x = 0,
 	y = 0,
 	w = 0,
 	h = 0,
 	
+	-- parent size
 	parW = 0,
 	parH = 0,
 	
+	-- parent cell size
 	parCellW = 0,
 	parCellH = 0,
 	
-	parcellBrdW = 0,
-	parcellBrdH = 0,
+	-- parent cell border size
+	parCellBrdW = 0,
+	parCellBrdH = 0,
 	
+	-- selected grid cell
 	selectedCol = 0,
 	selectedRow = 0,
 	
+	-- scroll offset
 	offX = 0,
 	offY = 0,
 	
+	-- scrolling area size
 	scrW = 0,
 	scrH = 0,
 	
+	-- content size
 	conW = 0,
 	conH = 0,
 	
+	-- animation parameters
 	frame  = 0,
 	mark   = 0,
 	frames = 0,
-	
 	newstate = false,
 	oldstate = false,
 
+	-- scroll and move parameters
 	pointerX  = 0, -- current X of pointer
 	pointerY  = 0, -- current Y of pointer
 	pointerDX = 0, -- delta X value
 	pointerDY = 0, -- delta Y value
 	pointerAX = 0, -- accumulated X value
-	pointerAY = 0, -- accumulated Y value
+	pointerAY = 0, -- accumulated Y value,
+	
+	-- built-in Sprite parameters
+	super = Layout.super,
+	removeFromParent = Layout.removeFromParent,
+	hitTestPoint = Layout.hitTestPoint,
+	
+	-- animation functions
+	animate = false,
+	backupState = false,
+	continueAnimation = false,
+	getAnchorPoint = false,
+	getRelativePosition = false,
+	play = false,
+	restoreState = false,
+	setAnchorPoint = false,
+	setRelativePosition = false,
+	
+	-- events functions
+	disableEvents = false,
+	enableEvents = false,
+	
+	-- order changing function
+	bringToFront = false,
+	
+	-- grid helper function
+	getGridSize = false,
+	
+	-- core funciton to check for updates and animation
+	enterFrame = false,
+	
+	-- auxilary functions
+	newAnimation = false,
+	newResources = false,
+
+	-- event processing functions
+	atHover = false,
+	atPress = false,
+	atScaleOrTilt = false,
+	onKeyOrButton = false,
+	onMouseDown = false,
+	onMouseHover = false,
+	onMouseMove = false,
+	onRelease = false,
+	onTouchesBegin = false,
+	onTouchesMove = false,
+	
+	-- select functions
+	select = false,
+	selectCell = false,
+
+	-- update functions
+	update = false,
+	updateColor = false,
+	updateMove = false,
+	updateScroll = false,
+	updateSprite = false,
+	updateTemplateGrid = false,
+	updateTexture = false,
 }
 
 for k,v in pairs(internal) do Layout[k] = v end
 
-function Layout:with(d)
+function Layout:with(old, new)
+	local d = {}
 	local s = self.superclass
+	
+	if new then
+		for k,v in pairs(old) do
+			if Layout[k] == nil then
+				if s and s[k] == nil then
+					error("Layout: new key `"..tostring(k).."`", 2)
+				end
+			end
+		end
+		
+		for k,v in pairs(new) do
+			if Layout[k] ~= nil or (s and s[k] ~= nil) then
+				error("Layout: old key `"..tostring(k).."`", 2)
+			end
+		end
+		
+		for k,v in pairs(new) do d[k] = v end
+	end
+	
+	for k,v in pairs(old) do d[k] = v end
+	
 	if s then
 		for k,v in pairs(s) do if d[k] == nil then d[k] = v end end
 		if s.init ~= d.init then
@@ -338,12 +435,13 @@ function Layout:with(d)
 		if s.ext ~= d.ext then
 			local extS, extD = s.ext, d.ext
 			d.ext = function(self, p) extS(self, p); extD(self, p) end
-		end		
+		end
 	end
+	
 	return {
 		new = function(p)
 			for k,v in pairs(d) do if p[k] == nil then p[k] = v end end
-			local layout = Layout.new(p)
+			local layout = Layout.new(p, d)
 			return layout
 		end,
 		superclass = d,
@@ -351,7 +449,7 @@ function Layout:with(d)
 	}
 end
 
-function Layout.new(p)
+function Layout.new(p, d)
 	local self = Mesh.new()
 	Mesh.setIndexArray(self, 1, 2, 3, 1, 3, 4)
 	Mesh.setVertices(self, 1,0,0, 2,0,0, 3,0,0, 4,0,0)
@@ -361,9 +459,11 @@ function Layout.new(p)
 	
 	for k,v in pairs(p) do
 		if tonumber(k) then
-			self:addChild(self.ext and self:ext(v) or v) 
-		else
+			self:addChild(self.ext and self:ext(v) or v)
+		elseif Layout[k] ~= nil or (d and d[k] ~= nil) then
 			self[k] = v
+		else
+			error("Layout: unknown key `"..tostring(k).."`", 2)
 		end
 	end
 	
@@ -389,7 +489,7 @@ function Layout:enterFrame(e)
 	if parent.isLayout then
 		if parent.w == 0 or parent.h == 0 then return end
 		self.parW, self.parH = parent.w, parent.h
-		self.parcellBrdW, self.parcellBrdH = parent.cellBrdW, parent.cellBrdH
+		self.parCellBrdW, self.parCellBrdH = parent.cellBrdW, parent.cellBrdH
 		self.parCellW = parent.cellAbsW or parent.cellRelW * parent.w
 		self.parCellH = parent.cellAbsH or parent.cellRelH * parent.h
 	elseif parent == stage then
@@ -842,9 +942,9 @@ function Layout:update(p)
 	local offX, offY = self.offX, self.offY
 	self:setClip(offX, offY, w, h)
 	
-	local x = self.col and (self.parCellW + self.parcellBrdW) * self.col or self.absX or
+	local x = self.col and (self.parCellW + self.parCellBrdW) * self.col or self.absX or
 		(self.relX and self.relX * self.parW or self.ancX * (self.parW - w))
-	local y = self.row and (self.parCellH + self.parcellBrdH) * self.row or self.absY or
+	local y = self.row and (self.parCellH + self.parCellBrdH) * self.row or self.absY or
 		(self.relY and self.relY * self.parH or self.ancY * (self.parH - h))
 	
 	local ax, ay = self.centerX * w, self.centerY * h
@@ -1073,12 +1173,12 @@ end
 function Layout:getGridSize()
 	local cols, rows = self.cols, self.rows
 	local num = self.database and #self.database or self:getNumChildren()
-	if cols == 0 and rows == 0 then -- auto grid size
+	if cols == 0 and rows == 0 then
 		rows = math.ceil(math.sqrt(num))
 		cols = math.ceil(num / rows)
-	elseif rows == 0 then -- auto rows number
+	elseif rows == 0 then
 		rows = math.ceil(num/cols)
-	elseif cols == 0 then -- auto columns number
+	elseif cols == 0 then
 		cols = math.ceil(num/rows)
 	end
 	return cols, rows, num
