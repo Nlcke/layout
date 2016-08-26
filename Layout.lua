@@ -310,6 +310,9 @@ local internal = {
 	selectedCol = 0,
 	selectedRow = 0,
 	
+	-- selected sprite/layout
+	selected = stage,
+	
 	-- scroll offset
 	offX = 0,
 	offY = 0,
