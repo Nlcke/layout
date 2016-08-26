@@ -20,7 +20,7 @@ Layout is GUI framework for Gideros game engine.
 * [Hello, world!](#hello-world)
 * [Layout API:](#layout-api)
   * [`Layout.new(p)`](#layout-new)
-  * [`Layout:with(p)`](#layout-with)
+  * [`Layout:with(p)` and `Layout:with(old, new)`](#layout-with)
   * [`Layout:update([p]`)](#layout-update)
   * [`Layout(id)`](#layout-id)
   * [`Layout(col, row)`](#layout-col-row)
@@ -73,15 +73,15 @@ layout{child1, child2, ... childN, setting1 = value1, setting2 = value2, ... set
 ```
 Each integer key will be treated as a child to add and other keys will be treated as settings.
 NOTE: It is an error to use it without any parameters (`Layout.new()`) or call it with multiple arguments (`Layout.new(a, b, c)`).
-#### <a name = "layout-with">Layout:with(p)</a>
-Extends Layout or Layout-based class with new settings and returns new class. Accepts only one parameter `p` which should be a table. All settings from this table will override existing parameters or create new ones. Resulting class can be instantiated (`new`) or extended (`with`).
+#### <a name = "layout-with">Layout:with(p) and Layout:with(old, new)</a>
+Extends Layout or Layout-based class with new settings and returns new class. Accepts one (`p`) or two parameters (`old`, `new`) which should be tables. Resulting class can be instantiated (`new`) or extended (`with`).
+
+All existing settings will be silently overridden and new keys will be silently created when only one parameter `p` is used. If you don't know Layout structure well, it's recommended to use second form of `with` (`Layout:with(old, new)`) i.e. split parameters into two tables where first table `old` allows only override keys and second table `new` allows only create new keys.
 
 There are 3 special callback-keys which you can optionally use in `p` table to make your classes more flexible:
 * `init(self, p)` -- called at class instantiation
 * `ext(self, child)` -- called at children adding
 * `upd(self, p)` -- called at layout update
-
-All existing settings will be overridden silently so it's recommended to check parent class first if you don't know it's structure well. For example, if you want to add `buttonText` key to `Layout` class you can do `assert(Layout.buttonText)` to check if it exists.
 
 Examples:
 ```lua
@@ -108,8 +108,17 @@ Button = Layout:with{
 	onPress = function(self) print(self.text, self.col, self.row) end
 }
 
+RedButton = Layout:with({ -- only for overridden keys
+	bgrC = 0xFF0000,
+	},{ -- only for new keys
+	isRedButton = true
+})
+
 local button = Button.new{}
 stage:addChild(button)
+
+local redbutton = RedButton.new{}
+stage:addChild(redbutton)
 ```
 #### <a name = "layout-update">Layout:update([p])</a>
 Updates existing layout with new settings from optional settings table `p` and/or adds children with numeric indexes from it. Most common way to use it:
