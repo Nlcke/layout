@@ -1,6 +1,6 @@
 local counter = 0
 local function countdown() counter = counter - 1 end
-local function countup() counter = counter + 1 print(counter) end
+local function countup() counter = counter + 1 end
 
 local elements = {}
 for name in ("\n"..splashscreenDesc):gmatch"\n(.-%.png)" do

@@ -85,7 +85,11 @@ local Button = Layout:with{
 	
 	onBack = function(self, parent)
 		if path == "" then
-			
+			if stage:getNumChildren() == 2 then
+				local l1, l2 = stage:getChildAt(1), stage:getChildAt(2)
+				local backbutton = l1 ~= layout and l1 or l2
+				backbutton:onPress()
+			end
 		else
 			self.onPress{text = ".."}
 		end

@@ -1,38 +1,44 @@
 local dx, dy = math.random(-2, 2), math.random(-2, 2)
 
 local layout = Layout.new{
-	cellRelW = 0.2, cellRelH = 0.5,
+	cellRelW = 1/6, cellRelH = 1/2,
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	Layout.new{
 		texture = skyworldTexture,
+		texM = Layout.NO_SCALE,
+		TextField.new(font, " NO_SCALE ", "|"),
+		col = 0, row = 0,
+	},
+	Layout.new{
+		texture = skyworldTexture,
 		texM = Layout.LETTERBOX,
 		TextField.new(font, " LETTERBOX ", "|"),
-		col = 0, row = 0,
+		col = 1, row = 0,
 	},
 	Layout.new{
 		texture = skyworldTexture,
 		texM = Layout.STRETCH,
 		TextField.new(font, " STRETCH ", "|"),
-		col = 1, row = 0,
+		col = 2, row = 0,
 	},
 	Layout.new{
 		texture = skyworldTexture,
 		texM = Layout.FIT_WIDTH,
 		TextField.new(font, " FIT_WIDTH ", "|"),
-		col = 2, row = 0,
+		col = 3, row = 0,
 	},
 	Layout.new{
 		texture = skyworldTexture,
 		texM = Layout.FIT_HEIGHT,
 		TextField.new(font, " FIT_HEIGHT ", "|"),
-		col = 3, row = 0,
+		col = 4, row = 0,
 	},
 	Layout.new{
 		texture = skyworldTexture,
 		texM = Layout.CROP,
 		TextField.new(font, " CROP ", "|"),
-		col = 4, row = 0,
+		col = 5, row = 0,
 	},
 	Layout.new{
 		id = "scrbg",
@@ -55,7 +61,7 @@ local layout = Layout.new{
 		texture = ringtile,
 		texM = Layout.CROP, texS = 0.125,
 		texAncX = 0.75, texAncY = 0.25,
-		col = 0, row = 1, cellW = 5,
+		col = 0, row = 1, cellW = 6,
 		onPress = function()
 			dx, dy = math.random(-2, 2), math.random(-2, 2)
 		end

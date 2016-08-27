@@ -10,7 +10,7 @@ local layout = Layout.new{
 	cols = 3, rows = 4,
 	cellBrdW = 5, cellBrdH = 5,
 	cellRelW = 1/3, cellRelH = 1/2,
-	Layout.new{bitmaps.Fruits, col = 0, row = 0, sprM = Layout.CROP, cellW = 3},	
+	Layout.new{bitmaps.Fruits, col = 0, row = 0, sprM = Layout.CROP, cellW = 3},
 	Layout.new{bitmaps.orange,     col = 0, row = 1, sprM = Layout.CROP},
 	Layout.new{bitmaps.cherry,     col = 1, row = 1, sprM = Layout.CROP},
 	Layout.new{bitmaps.banana,     col = 2, row = 1, sprM = Layout.CROP},	

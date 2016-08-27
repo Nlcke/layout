@@ -1430,8 +1430,6 @@ function Layout:selectCell(col, row)
 	self.selectedCol, self.selectedRow = col, row
 	if not self.__children then return end
 	
-	self.frame = self.frames
-	
 	local cell = nil
 	for _,child in pairs(self.__children) do
 		if child.col == col and child.row == row then
