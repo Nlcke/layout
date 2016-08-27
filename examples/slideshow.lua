@@ -47,6 +47,7 @@ local leftbutton = Layout.new{
 	onPress = function(self)
 		i = i - 1
 		if i < 1 then i = l end
+		nextImage:play(false)
 		thisImage:update{anRemove = Layout.newAnimation()}
 		thisImage:removeFromParent()
 		nextImage:update{
@@ -70,6 +71,7 @@ local rightbutton = Layout.new{
 	onPress = function(self)
 		i = i + 1
 		if i > l then i = 1 end
+		nextImage:play(false)
 		thisImage:update{anRemove = Layout.newAnimation()}
 		thisImage:removeFromParent()
 		nextImage:update{

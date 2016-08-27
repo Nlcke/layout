@@ -1,24 +1,24 @@
 <project>
- <properties osx_category="5" winrt_package="com.yourdomain.yourapp" splash_v_image="" ios_bundle="com.yourdomain." app_icon="" version_code="1" android_template="0" windowWidth="0" touchToMouse="0" fps="60" tv_icon="" iosDevice="0" winrt_org="GiderosMobile" scaleMode="0" osx_bundle="com.yourdomain." osx_org="GiderosMobile" autorotation="0" encryptCode="0" mouseTouchOrder="0" win_org="GiderosMobile" logicalWidth="320" win_domain="giderosmobile.com" html5_host="" orientation="0" logicalHeight="480" retinaDisplay="3" architecture="0" html5_mem="256" splash_h_image="" assetsOnly="0" packageName="com.yourdomain.yourapp" mouseToTouch="0" version="1.0" windowHeight="0" osx_domain="giderosmobile.com" encryptAssets="0">
+ <properties windowHeight="0" ios_bundle="com.yourdomain." win_domain="giderosmobile.com" html5_mem="256" logicalWidth="320" osx_org="GiderosMobile" osx_bundle="com.yourdomain." scaleMode="0" winrt_package="com.yourdomain.yourapp" splash_v_image="" mouseToTouch="0" packageName="com.yourdomain.yourapp" html5_host="" splash_h_image="" fps="60" version_code="1" win_org="GiderosMobile" mouseTouchOrder="0" assetsOnly="0" app_icon="" touchToMouse="0" tv_icon="" retinaDisplay="3" windowWidth="0" architecture="0" logicalHeight="480" version="1.0" osx_domain="giderosmobile.com" encryptCode="0" osx_category="5" orientation="0" encryptAssets="0" android_template="0" autorotation="0" winrt_org="GiderosMobile" iosDevice="0">
   <imageScales/>
   <plugins>
-   <plugin name="Media plugin" enabled="0"/>
-   <plugin name="Controller" enabled="0"/>
-   <plugin name="Lpeg" enabled="0"/>
-   <plugin name="Gaming" enabled="0"/>
-   <plugin name="Struct" enabled="0"/>
-   <plugin name="Google Play Services" enabled="0"/>
-   <plugin name="Camera" enabled="1"/>
-   <plugin name="LuaSqlite3" enabled="0"/>
-   <plugin name="Bitop" enabled="0"/>
-   <plugin name="Clipper" enabled="0"/>
-   <plugin name="Native" enabled="0"/>
-   <plugin name="LuaFileSystem" enabled="0"/>
-   <plugin name="JSON" enabled="0"/>
-   <plugin name="Flurry" enabled="0"/>
-   <plugin name="Lua Socket" enabled="0"/>
    <plugin name="Store Detector" enabled="0"/>
+   <plugin name="Lpeg" enabled="0"/>
+   <plugin name="Struct" enabled="0"/>
+   <plugin name="Native" enabled="0"/>
+   <plugin name="Gaming" enabled="0"/>
+   <plugin name="Clipper" enabled="0"/>
    <plugin name="Countly" enabled="0"/>
+   <plugin name="Lua Socket" enabled="0"/>
+   <plugin name="LuaSqlite3" enabled="0"/>
+   <plugin name="LuaFileSystem" enabled="0"/>
+   <plugin name="Google Play Services" enabled="0"/>
+   <plugin name="JSON" enabled="0"/>
+   <plugin name="Media plugin" enabled="0"/>
+   <plugin name="Bitop" enabled="0"/>
+   <plugin name="Camera" enabled="1"/>
+   <plugin name="Controller" enabled="0"/>
+   <plugin name="Flurry" enabled="0"/>
   </plugins>
   <exports>
    <export name="APK">
@@ -76,7 +76,7 @@
   <file source="examples/positioning.lua" excludeFromExecution="1"/>
   <file source="examples/sizing.lua" excludeFromExecution="1"/>
   <file source="examples/sliders.lua" excludeFromExecution="1"/>
-  <file source="examples/slideshow.lua" excludeFromExecution="1"/>
+  <file source="examples/slideshow.lua"/>
   <file source="examples/splashscreen.lua" excludeFromExecution="1"/>
   <file source="examples/template_grid.lua" excludeFromExecution="1"/>
   <file source="examples/texturing.lua" excludeFromExecution="1"/>
@@ -97,5 +97,5 @@
  </folder>
  <file source="Layout.lua"/>
  <file source="init.lua"/>
- <file source="main.lua"/>
+ <file source="main.lua" excludeFromExecution="1"/>
 </project>

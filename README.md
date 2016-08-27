@@ -203,7 +203,8 @@ layout = Layout.new{}
 Layout.select(layout)
 ```
 #### <a name = "layout-play">Layout:play(animation [,state] [,callback])</a>
-Plays an `animation`, optionally can animate `state` transitions and if specified a `callback` function will be executed at the end of animation. See Animation section for full description of available `animation` parameters. If defined `state` must be a table with numeric keys supported by this Layout class.
+Plays an `animation` if it is a table, optionally can animate `state` transitions and if specified a `callback` function will be executed at the end of animation. See Animation section for full description of available `animation` parameters. If defined `state` must be a table with numeric keys supported by this Layout class.
+Or instantly stops currently playing animation if `animation` is `false`.
 Examples:
 ```lua
 local layout = Layout.new{bgrA = 1.0, bgrC = 0xFF0000, absX = 0, absY = 200}

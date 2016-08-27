@@ -2,6 +2,12 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Layout API ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Layout.new{...} -- new layout with optional settings and/or children
 Layout:update{...} -- update layout with settings and/or children
+Layout:with(p) or Layout:with(old, new)
+	-- inheritance: extend Layout (sub)class with additional parameters
+	-- accepts one or two tables
+	-- if 'old' and 'new' tables used then keys will be checked
+	-- 'init' and 'upd' functions are inherited from all parents
+	-- resulting class can be instantiated (new) or extended (with)
 Layout(id) -- access child layout by it's unique id or it's draw order
 Layout(col, row) -- access cell by it's row and column numbers
 Layout.select(sprite) -- set focus and selector to that sprite
@@ -9,15 +15,12 @@ Layout.newAnimation(frames, mark, strength, seed)
 	-- returns random animation, all parameters are optional
 	-- 'seed' is used for randomizer to get same animation each time
 Layout:play(anim, [newstate], [callback])
-	-- plays animation, see description at Animation section
+	-- plays animation if 'anim' is table, see Animation section below
+	-- or instantly finishes current animation if 'anim' is false
 	-- newstate is a table with numeric parameters of layout
 	-- callback is a function which will be called at the end of animation
-Layout:with(p) or Layout:with(old, new)
-	-- accepts one or two tables
-	-- if 'old' and 'new' tables used then keys will be checked
-	-- extend Layout class (or subclass) with additional parameters
-	-- 'init' and 'upd' functions are inherited from all parents
-	-- resulting class can be instantiated (new) or extended (with)
+Layout.newResources{...}
+	-- loads resources, see Resource Loader section below
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Resource Loader ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Layout has optional resource loader	to automatically load various resources.
@@ -349,13 +352,13 @@ local internal = {
 	hitTestPoint = Layout.hitTestPoint,
 	
 	-- animation functions
+	play = false,
+	continueAnimation = false,
 	animate = false,
 	backupState = false,
-	continueAnimation = false,
+	restoreState = false,
 	getAnchorPoint = false,
 	getRelativePosition = false,
-	play = false,
-	restoreState = false,
 	setAnchorPoint = false,
 	setRelativePosition = false,
 	
@@ -1355,6 +1358,11 @@ function Layout:restoreState()
 end
 
 function Layout:play(anim, newstate, mark)
+	if anim == false then
+		if self.frame == self.frames then return end
+		self.frame = self.frames - 1
+		return self:enterFrame()
+	end
 	if not anim.frames or anim.frames <= 0 then
 		error("animation: 'frames' key must be greater than 0")
 	end

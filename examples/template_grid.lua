@@ -31,7 +31,6 @@ local database = {}
 for i = 1, 1e6 do database[i] = {text = " Button "..i.." "} end
 
 local layout = Layout.new{
-	bringToFront = function() end,
 	template = Button, database = database,
 	colsFill = true,
 	scroll = true,

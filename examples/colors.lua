@@ -12,7 +12,6 @@ end
 local layout = Layout.new{
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
-	bringToFront = function() end,
     template = Layout, database = database, scroll = true,
     cellAbsW = 64, cellAbsH = 64,
     cols = 1024,
