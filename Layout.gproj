@@ -1,24 +1,24 @@
 <project>
- <properties windowHeight="0" ios_bundle="com.yourdomain." win_domain="giderosmobile.com" html5_mem="256" logicalWidth="320" osx_org="GiderosMobile" osx_bundle="com.yourdomain." scaleMode="0" winrt_package="com.yourdomain.yourapp" splash_v_image="" mouseToTouch="0" packageName="com.yourdomain.yourapp" html5_host="" splash_h_image="" fps="60" version_code="1" win_org="GiderosMobile" mouseTouchOrder="0" assetsOnly="0" app_icon="" touchToMouse="0" tv_icon="" retinaDisplay="3" windowWidth="0" architecture="0" logicalHeight="480" version="1.0" osx_domain="giderosmobile.com" encryptCode="0" osx_category="5" orientation="0" encryptAssets="0" android_template="0" autorotation="0" winrt_org="GiderosMobile" iosDevice="0">
+ <properties retinaDisplay="3" orientation="0" windowHeight="0" tv_icon="" version="1.0" win_org="GiderosMobile" splash_v_image="" logicalHeight="480" osx_org="GiderosMobile" iosDevice="0" winrt_org="GiderosMobile" osx_domain="giderosmobile.com" html5_mem="256" html5_host="" encryptAssets="0" logicalWidth="320" architecture="0" scaleMode="0" ios_bundle="com.yourdomain." winrt_package="com.yourdomain.yourapp" touchToMouse="0" version_code="1" app_icon="" splash_h_image="" osx_category="5" assetsOnly="0" encryptCode="0" windowWidth="0" android_template="0" mouseToTouch="0" fps="60" autorotation="0" mouseTouchOrder="0" osx_bundle="com.yourdomain." packageName="com.yourdomain.yourapp" win_domain="giderosmobile.com">
   <imageScales/>
   <plugins>
-   <plugin name="Store Detector" enabled="0"/>
-   <plugin name="Lpeg" enabled="0"/>
-   <plugin name="Struct" enabled="0"/>
-   <plugin name="Native" enabled="0"/>
-   <plugin name="Gaming" enabled="0"/>
-   <plugin name="Clipper" enabled="0"/>
-   <plugin name="Countly" enabled="0"/>
-   <plugin name="Lua Socket" enabled="0"/>
-   <plugin name="LuaSqlite3" enabled="0"/>
-   <plugin name="LuaFileSystem" enabled="0"/>
-   <plugin name="Google Play Services" enabled="0"/>
-   <plugin name="JSON" enabled="0"/>
-   <plugin name="Media plugin" enabled="0"/>
-   <plugin name="Bitop" enabled="0"/>
-   <plugin name="Camera" enabled="1"/>
-   <plugin name="Controller" enabled="0"/>
-   <plugin name="Flurry" enabled="0"/>
+   <plugin enabled="0" name="Lpeg"/>
+   <plugin enabled="1" name="Camera"/>
+   <plugin enabled="0" name="Countly"/>
+   <plugin enabled="0" name="Bitop"/>
+   <plugin enabled="0" name="Lua Socket"/>
+   <plugin enabled="0" name="Google Play Services"/>
+   <plugin enabled="0" name="Media plugin"/>
+   <plugin enabled="0" name="Struct"/>
+   <plugin enabled="0" name="Native"/>
+   <plugin enabled="0" name="LuaFileSystem"/>
+   <plugin enabled="0" name="Store Detector"/>
+   <plugin enabled="0" name="Gaming"/>
+   <plugin enabled="0" name="LuaSqlite3"/>
+   <plugin enabled="0" name="JSON"/>
+   <plugin enabled="0" name="Flurry"/>
+   <plugin enabled="0" name="Clipper"/>
+   <plugin enabled="0" name="Controller"/>
   </plugins>
   <exports>
    <export name="APK">
@@ -68,19 +68,19 @@
   <file source="images/yosemite.jpg"/>
  </folder>
  <folder name="examples">
-  <file source="examples/colors.lua" excludeFromExecution="1"/>
-  <file source="examples/dialog.lua" excludeFromExecution="1"/>
-  <file source="examples/file_explorer.lua" excludeFromExecution="1"/>
-  <file source="examples/manual_grid.lua" excludeFromExecution="1"/>
-  <file source="examples/multiline_text.lua" excludeFromExecution="1"/>
-  <file source="examples/positioning.lua" excludeFromExecution="1"/>
-  <file source="examples/sizing.lua" excludeFromExecution="1"/>
-  <file source="examples/sliders.lua" excludeFromExecution="1"/>
-  <file source="examples/slideshow.lua"/>
-  <file source="examples/splashscreen.lua" excludeFromExecution="1"/>
-  <file source="examples/template_grid.lua" excludeFromExecution="1"/>
-  <file source="examples/texturing.lua" excludeFromExecution="1"/>
-  <file source="examples/thumbnail_viewer.lua" excludeFromExecution="1"/>
+  <file excludeFromExecution="1" source="examples/colors.lua"/>
+  <file excludeFromExecution="1" source="examples/dialog.lua"/>
+  <file excludeFromExecution="1" source="examples/file_explorer.lua"/>
+  <file excludeFromExecution="1" source="examples/manual_grid.lua"/>
+  <file excludeFromExecution="1" source="examples/multiline_text.lua"/>
+  <file excludeFromExecution="1" source="examples/positioning.lua"/>
+  <file excludeFromExecution="1" source="examples/sizing.lua"/>
+  <file excludeFromExecution="1" source="examples/sliders.lua"/>
+  <file excludeFromExecution="1" source="examples/slideshow.lua"/>
+  <file excludeFromExecution="1" source="examples/splashscreen.lua"/>
+  <file excludeFromExecution="1" source="examples/template_grid.lua"/>
+  <file excludeFromExecution="1" source="examples/texturing.lua"/>
+  <file excludeFromExecution="1" source="examples/thumbnail_viewer.lua"/>
  </folder>
  <folder name="resources">
   <file source="resources/BlissPro-Bold.otf"/>
@@ -97,5 +97,5 @@
  </folder>
  <file source="Layout.lua"/>
  <file source="init.lua"/>
- <file source="main.lua" excludeFromExecution="1"/>
+ <file source="main.lua"/>
 </project>
