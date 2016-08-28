@@ -894,7 +894,7 @@ function Layout:update(p)
 		if p.database ~= nil then
 			self.offX, self.offY = 0, 0
 			self.w, self.h = 0, 0
-			self:selectCell(0, 0)
+			self.selectedCol, self.selectedRow = 0, 0
 			if self.__children then
 				for i, child in pairs(self.__children) do
 					child:removeFromParent()
@@ -1584,9 +1584,17 @@ stage:addEventListener(Event.KEY_UP, function(e)
 end)
 
 stage:addEventListener(Event.MOUSE_WHEEL, function(e)
-	local keys = Layout.selected.isLayout and
-		Layout.selected.keys or Layout.keys
-	if keys.mouseWheel then
+	local selected = Layout.selected
+	local keys = selected.isLayout and selected.keys or Layout.keys
+	local parent = selected.__parent
+	if keys.mouseWheel and parent and parent.template then	
+		local off = parent.offY + (selected.parCellH + selected.parCellBrdH) *
+			(e.wheel < 0 and 1 or -1)
+		if off < 0 then off = 0
+		elseif off > parent.scrH then off = parent.scrH end
+		if off == parent.offY then return end
+		parent:update{offY = off}
+	elseif keys.mouseWheel then
 		Layout.onKeyOrButton(e.wheel > 0 and "UP" or "DOWN")
 	end
 end)
