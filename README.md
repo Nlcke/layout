@@ -285,6 +285,8 @@ cellH = 1.0, -- cell height relative modifier
 -- selector
 selector = Layout.new{bgrA = 0.25}, -- [Layout]
 selectable = true, -- can be selected by keyboard/joystick, [true|false]
+selectedCol = 0, -- col to select grid cell
+selectedRow = 0, -- row to select grid cell
 
 -- background
 bgrC = 0x000000, -- background color, [0x000000..0xFFFFFF]

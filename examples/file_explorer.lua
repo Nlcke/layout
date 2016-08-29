@@ -29,7 +29,6 @@ local database = path == "" and {} or {{text = ".."}}
 for i = 1, #filenames do database[#database+1] = {text = filenames[-i]} end
 local callback = print
 
-
 local layout, panel1, panel2
 
 local Button = Layout:with{
@@ -75,8 +74,7 @@ local Button = Layout:with{
 		if path == "" then filenames = rootnames end
 		local database = path == "" and {} or {{text = ".."}}
 		for i = 1, #filenames do database[#database+1] = {text = filenames[-i]} end
-		
-		panel2:update{database = database}
+		panel2:update{database = database, selectedRow = 0}
 		panel1:removeFromParent()
 		layout:addChild(panel2)
 		panel1, panel2 = panel2, panel1

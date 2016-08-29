@@ -21,7 +21,6 @@ Layout:play(anim, [newstate], [callback])
 	-- callback is a function which will be called at the end of animation
 Layout.newResources{...}
 	-- loads resources, see Resource Loader section below
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Resource Loader ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Layout has optional resource loader	to automatically load various resources.
 From the box it supports .jpg, .png, .wav, .mp3, .ttf, .otf, .lua, .json.
@@ -44,13 +43,11 @@ Layout.newResources{...} where {...} is a table with following parameters:
 	fontSize         = number
 	fontText         = text
 	fontFiltering    = boolean
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Animation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 to describe animation a table with the following keys must be used:
 -- 'frames' key --
 defines animation length
 if 'frames' is not exist or is 0 or less then you will get error message
-
 -- 'mark' key --
 defines the type of animation
 it accepts following values: [-1|0|0..1|1..]
@@ -61,11 +58,9 @@ initial -> new -> initial and 'mark' defines 'initial -> new' length
 if 'mark' is in [0..1] range then it will relative to 'frames'
 if 'mark' is in [1..frames] then it will be used as is
 if 'mark' is in [frames..] then their values will be swapped
-
 -- 'strength' key --
 defines multiplier for t (time) parameter to change animation range
 equal to 1 if not defined
-
 -- other animation keys --
 key names are same as Sprite.set accepts:
 	x, y, anchorX, anchorY,
@@ -74,19 +69,15 @@ key names are same as Sprite.set accepts:
 	redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier
 key values can be [nil|number|function]
 all keys are relative to initial state of layout i.e. 0 means no change
-
 -- numeric keys --
 each number will be multiplied by t (time) and added to origin,
 where t is time (frame / frames) in range [0..1]
-
 -- function-keys --
 function must accept one parameter t (time), where t = [0..1]
 function must return a number (delta) based on that parameter t
 result of function will be multiplied by t and added to original value
-
 -- x, y, anchorX, anchorY --
 this parameters are relative to width and height of the layout
-
 -- rotation --
 rotation will be multiplied by 360 (1.0 = 360, -0.5 = -180, etc)
 --]]------------------------------------------------------------------------
@@ -154,6 +145,8 @@ local default = {
 	-- selector
 	selector = Layout.new{bgrA = 0.25}, -- [Layout]
 	selectable = true, -- can be selected by keyboard/joystick, [true|false]
+	selectedCol = 0, -- col to select grid cell
+	selectedRow = 0, -- row to select grid cell
 	
 	-- background
 	bgrC = 0x000000, -- background color, [0x000000..0xFFFFFF]
@@ -311,10 +304,6 @@ local internal = {
 	-- parent cell border size
 	parCellBrdW = 0,
 	parCellBrdH = 0,
-	
-	-- selected grid cell
-	selectedCol = 0,
-	selectedRow = 0,
 	
 	-- selected sprite/layout
 	selected = stage,
@@ -925,11 +914,14 @@ function Layout:update(p)
 		self.w, self.h = w, h
 		if self.template then
 			local cols, rows = self:getGridSize()
-			local w = self.cellAbsW or self.cellRelW * self.w
-			local h = self.cellAbsH or self.cellRelH * self.h
-			local fw, fh = w + self.cellBrdW, h + self.cellBrdH
+			local fw = (self.cellAbsW or self.cellRelW * self.w) + self.cellBrdW
+			local fh = (self.cellAbsH or self.cellRelH * self.h) + self.cellBrdH
 			self.conW = fw * cols - self.cellBrdW
 			self.conH = fh * rows - self.cellBrdH
+			if p then
+				if p.selectedCol then self.offX = fh * self.selectedCol end
+				if p.selectedRow then self.offY = fh * self.selectedRow end
+			end
 		else
 			if self.cols > 0 then
 				self.conW = (self.cellAbsW or self.cellRelW * self.w) * self.cols
@@ -943,7 +935,7 @@ function Layout:update(p)
 			end
 		end
 		self.scrW = math.max(0, self.conW - self.w)
-		self.scrH = math.max(0, self.conH - self.h)
+		self.scrH = math.max(0, self.conH - self.h)	
 		self.offX = math.min(self.offX, self.scrW)
 		self.offY = math.min(self.offY, self.scrH)
 	end
@@ -1255,8 +1247,11 @@ function Layout:updateTemplateGrid()
 		end
 	end
 	
-	if isSelected and self:getNumChildren() > 0 then
-		self:getChildAt(1):select()
+	if isSelected and self.__children then
+		local col, row = self.selectedCol, self.selectedRow
+		local n = self.colsFill and (col - col0) * urows + row - row0 + 1 or
+			(row - row0) * ucols + col - col0 + 1
+		self:getChildAt(math.min(n, self:getNumChildren())):select()
 	end
 end
 
