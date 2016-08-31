@@ -244,6 +244,7 @@ local default = {
 	onMove   = false, -- callback at layout moving, [false|function]
 	onScroll = false, -- callback at layout scrolling, [false|function]
 	onBack   = false, -- callback at "BACK" action, [false|function]
+	onResize = false, -- callback at changing size, [false|function]
 	
 	-- built-in callbacks
 	scroll = false, -- move children with mouse or touch, [false|true]
@@ -479,11 +480,10 @@ end
 
 function Layout:enterFrame(e)	
 	if not self.__parent then return end
-	local parent = self.__parent
-
-	local update = false
 	
+	local parent = self.__parent
 	local parW, parH = self.parW, self.parH
+	
 	if parent.isLayout then
 		if parent.w == 0 or parent.h == 0 then return end
 		self.parW, self.parH = parent.w, parent.h
@@ -505,7 +505,7 @@ function Layout:enterFrame(e)
 		parent:addChild(self)
 	end
 	
-	if self.parW ~= parW or self.parH ~= parH then update = true end
+	local update = self.parW ~= parW or self.parH ~= parH
 	
 	if self.onHold and self.event == Layout.PRESS_HOLD then self:onHold() end
 	
@@ -861,6 +861,29 @@ end
 
 function Layout:update(p)
 	if p then
+		if self.__parent and self.parent ~= self.__parent then
+			local parent = self.__parent
+			if parent.isLayout then
+				self.parW, self.parH = parent.w, parent.h
+				self.parCellBrdW = parent.cellBrdW
+				self.parCellBrdH = parent.cellBrdH
+				self.parCellW = parent.cellAbsW or parent.cellRelW * parent.w
+				self.parCellH = parent.cellAbsH or parent.cellRelH * parent.h
+			elseif parent == stage then
+				if application:getScaleMode() == "noScale" then
+					self.parW = application:getDeviceWidth()
+					self.parH = application:getDeviceHeight()			
+				else
+					self.parW = application:getContentWidth()
+					self.parH = application:getContentHeight()
+				end
+			else
+				Sprite.removeFromParent(self)
+				self.parW = parent:getWidth()
+				self.parH = parent:getHeight()
+				parent:addChild(self)
+			end
+		end
 		if self.upd then self:upd(p) end
 		if p.texture ~= nil then
 			local c, a
@@ -890,6 +913,13 @@ function Layout:update(p)
 				end
 			end
 		end
+		if p.ancX then self.offX = self.scrW * self.ancX end
+		if p.ancY then self.offY = self.scrH * self.ancY end
+		if p.offX or p.offY then
+			if p.offX then self.ancX = p.offX / self.scrW end
+			if p.offY then self.ancY = p.offY / self.scrH end
+			if self.onScroll then self:onScroll() end
+		end
 		for k,v in pairs(p) do
 			if tonumber(k) then
 				self:addChild(self.ext and self:ext(v) or v) 
@@ -914,13 +944,24 @@ function Layout:update(p)
 		self.w, self.h = w, h
 		if self.template then
 			local cols, rows = self:getGridSize()
-			local fw = (self.cellAbsW or self.cellRelW * self.w) + self.cellBrdW
-			local fh = (self.cellAbsH or self.cellRelH * self.h) + self.cellBrdH
-			self.conW = fw * cols - self.cellBrdW
-			self.conH = fh * rows - self.cellBrdH
-			if p then
-				if p.selectedCol then self.offX = fh * self.selectedCol end
-				if p.selectedRow then self.offY = fh * self.selectedRow end
+			local cw = (self.cellAbsW or self.cellRelW * self.w) + self.cellBrdW
+			local ch = (self.cellAbsH or self.cellRelH * self.h) + self.cellBrdH
+			self.conW = cw * cols - self.cellBrdW
+			self.conH = ch * rows - self.cellBrdH
+			if p and (p.selectedCol or p.selectedRow) then
+				self.scrW = math.max(0, self.conW - self.w)
+				self.scrH = math.max(0, self.conH - self.h)
+				if p.selectedCol then
+					self.offX = math.min(cw * self.selectedCol, self.scrW)
+					self.ancX = self.offX / self.scrW
+				end
+				if p.selectedRow then
+					self.offY = math.min(ch * self.selectedRow, self.scrH)
+					self.ancY = self.offY / self.scrH
+				end
+				if self.ancX ~= self.ancX then self.ancX = 0 end
+				if self.ancY ~= self.ancY then self.ancY = 0 end
+				if self.onScroll then self:onScroll() end
 			end
 		else
 			if self.cols > 0 then
@@ -935,9 +976,10 @@ function Layout:update(p)
 			end
 		end
 		self.scrW = math.max(0, self.conW - self.w)
-		self.scrH = math.max(0, self.conH - self.h)	
+		self.scrH = math.max(0, self.conH - self.h)
 		self.offX = math.min(self.offX, self.scrW)
 		self.offY = math.min(self.offY, self.scrH)
+		if self.onResize then self:onResize() end
 	end
 	
 	local offX, offY = self.offX, self.offY
@@ -1040,7 +1082,11 @@ function Layout:updateScroll(dx, dy)
 	if Layout.selected == self then
 		Layout.selector:setPosition(offX, offY)
 	end
+	
 	self.offX, self.offY = offX, offY
+	self.ancX, self.ancY = offX / self.scrW, offY / self.scrH
+	if self.ancX ~= self.ancX then self.ancX = 0 end
+	if self.ancY ~= self.ancY then self.ancY = 0 end
 	
 	if self.template and self.__children then
 		for _, child in pairs(self.__children) do
@@ -1523,7 +1569,7 @@ if pcall(require, "controller") then
 		local code = buttons[e.keyCode]
 		if code then
 			actions[code] = nil
-			if isOpeningOrEnding(selected) then return end
+			if isOpeningOrEnding(selected) or not selected.isLayout then return end
 			selected.event = Layout.IDLE
 			if code == "SELECT" then select() end
 		end
@@ -1572,7 +1618,7 @@ stage:addEventListener(Event.KEY_UP, function(e)
 	local code = keys[e.realCode]
 	if code then
 		actions[code] = nil
-		if isOpeningOrEnding(selected) then return end
+		if isOpeningOrEnding(selected) or not selected.isLayout then return end
 		selected.event = Layout.IDLE
 		if code == "SELECT" then select() end
 	end
@@ -1588,7 +1634,8 @@ stage:addEventListener(Event.MOUSE_WHEEL, function(e)
 		if off < 0 then off = 0
 		elseif off > parent.scrH then off = parent.scrH end
 		if off == parent.offY then return end
-		parent:update{offY = off}
+		parent:update{offY = off, ancY = off / parent.scrH}
+		if parent.onScroll then parent:onScroll() end
 	elseif keys.mouseWheel then
 		Layout.onKeyOrButton(e.wheel > 0 and "UP" or "DOWN")
 	end

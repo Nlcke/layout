@@ -384,6 +384,7 @@ onHold   = false, -- callback at LMB or touch while hold, [false|function]
 onMove   = false, -- callback at layout moving, [false|function]
 onScroll = false, -- callback at layout scrolling, [false|function]
 onBack   = false, -- callback at "BACK" action, [false|function]
+onResize = false, -- callback at changing size, [false|function]
 
 -- built-in callbacks
 scroll = false, -- move children with mouse or touch, [false|true]

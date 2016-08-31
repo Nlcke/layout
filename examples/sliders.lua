@@ -1,5 +1,4 @@
-Slider = Layout:with{
-	scroll = true,
+local Slider = Layout:with{
 	bgrC = 0x444444,
 	bgrA = 0.5,
 	
