@@ -1,35 +1,35 @@
 <project>
- <properties architecture="0" osx_org="GiderosMobile" win_domain="giderosmobile.com" html5_mem="256" version="1.0" encryptAssets="0" osx_bundle="com.yourdomain." osx_category="5" assetsOnly="0" android_template="0" winrt_package="com.yourdomain.yourapp" tv_icon="" scaleMode="0" splash_v_image="" version_code="1" autorotation="0" windowHeight="0" html5_host="" orientation="0" mouseTouchOrder="0" ios_bundle="com.yourdomain." win_org="GiderosMobile" fps="60" packageName="com.yourdomain.yourapp" osx_domain="giderosmobile.com" winrt_org="GiderosMobile" splash_h_image="" logicalWidth="320" logicalHeight="480" retinaDisplay="3" touchToMouse="0" windowWidth="0" encryptCode="0" app_icon="" iosDevice="0" mouseToTouch="0">
+ <properties architecture="0" win_domain="giderosmobile.com" html5_mem="256" mouseTouchOrder="0" fps="60" scaleMode="0" packageName="com.yourdomain.yourapp" autorotation="0" winrt_package="com.yourdomain.yourapp" html5_host="" encryptCode="0" splash_v_image="" retinaDisplay="3" version_code="1" win_org="GiderosMobile" orientation="0" windowWidth="0" iosDevice="0" touchToMouse="0" osx_domain="giderosmobile.com" tv_icon="" osx_category="5" windowHeight="0" logicalHeight="480" ios_bundle="com.yourdomain." osx_org="GiderosMobile" logicalWidth="320" assetsOnly="0" app_icon="" splash_h_image="" osx_bundle="com.yourdomain." winrt_org="GiderosMobile" mouseToTouch="0" version="1.0" android_template="0" encryptAssets="0">
   <imageScales/>
   <plugins>
-   <plugin name="LuaSqlite3" enabled="0"/>
-   <plugin name="Lpeg" enabled="0"/>
-   <plugin name="Clipper" enabled="0"/>
-   <plugin name="Bitop" enabled="0"/>
    <plugin name="LuaFileSystem" enabled="0"/>
    <plugin name="Flurry" enabled="0"/>
    <plugin name="Lua Socket" enabled="0"/>
+   <plugin name="Clipper" enabled="0"/>
+   <plugin name="Struct" enabled="0"/>
+   <plugin name="LuaSqlite3" enabled="0"/>
+   <plugin name="Gaming" enabled="0"/>
+   <plugin name="Lpeg" enabled="0"/>
    <plugin name="Native" enabled="0"/>
+   <plugin name="Bitop" enabled="0"/>
    <plugin name="Store Detector" enabled="0"/>
-   <plugin name="JSON" enabled="0"/>
+   <plugin name="Google Play Services" enabled="0"/>
    <plugin name="Controller" enabled="0"/>
    <plugin name="Media plugin" enabled="0"/>
-   <plugin name="Gaming" enabled="0"/>
-   <plugin name="Struct" enabled="0"/>
+   <plugin name="JSON" enabled="0"/>
    <plugin name="Countly" enabled="0"/>
-   <plugin name="Google Play Services" enabled="0"/>
    <plugin name="Camera" enabled="1"/>
   </plugins>
   <exports>
    <export name="APK">
-    <property name="androidPath" value=""/>
-    <property name="androidSdk" value="23"/>
-    <property name="androidTarget" value="19"/>
-    <property name="androidTools" value="23.0.1"/>
-    <property name="javaPath" value=""/>
-    <property name="keyAlias" value=""/>
-    <property name="keyStore" value=""/>
-    <property name="packageName" value="com.yourdomain.yourapp"/>
+    <property value="" name="androidPath"/>
+    <property value="23" name="androidSdk"/>
+    <property value="19" name="androidTarget"/>
+    <property value="23.0.1" name="androidTools"/>
+    <property value="" name="javaPath"/>
+    <property value="" name="keyAlias"/>
+    <property value="" name="keyStore"/>
+    <property value="com.yourdomain.yourapp" name="packageName"/>
    </export>
   </exports>
  </properties>

@@ -114,7 +114,7 @@ local Panel = Layout:with{
 	anAdd = Layout.newAnimation(),
 	anRemove = Layout.newAnimation(),
 	cellAbsH = 50,
-	cellBrdW = 5, cellBrdH = 5,
+	cellBrdH = 5,
 	cols = 1,
 	relW = 1 - sliderWidth, relX = 0,
 	onScroll = function(self) slider"handle":update{ancY = self.ancY} end,

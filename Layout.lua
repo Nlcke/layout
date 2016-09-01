@@ -538,8 +538,6 @@ function Layout:enterFrame(e)
 				self.parent = nil
 				Sprite.removeFromParent(self)
 				return
-			elseif self.event == Layout.HOVER then
-				if self.onHover then self:onHover() end
 			elseif self.event == Layout.PLAY then
 				if self.onPlay then self:onPlay() end
 				if self.events then self:enableEvents() end
