@@ -341,12 +341,12 @@ keys = { -- [realCode] = action
 
 -- gamepad control, can have multiple buttons for the same action
 buttons = { -- [keyCode] = action
-	[21]  =     "UP",
-	[22]  =   "DOWN",
-	[105] =  "RIGHT",
-	--[???] = "LEFT", -- controller plugin is broken for desktop
-	[96]  = "SELECT",
-	[97]  =   "BACK",
+	[19] = "UP",
+	[20] = "DOWN",
+	[22] = "RIGHT",
+	[21] = "LEFT",
+	[96] = "SELECT",
+	[97] = "BACK",
 	
 	-- left stick for "UP", "DOWN", "RIGHT", "LEFT" actions
 	stickDeadzone = 0.5, -- [0..1], stick disabled at 1
