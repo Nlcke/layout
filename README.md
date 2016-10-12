@@ -315,6 +315,9 @@ sprOffY = 0.0, -- sprite Y offset (in pixels)
 centerX = 0.5, -- [0..1]
 centerY = 0.5, -- [0..1]
 
+-- content clipping
+clip = true,
+
 -- identification
 id = false, -- to get child by id with 'layout(id)' call
 

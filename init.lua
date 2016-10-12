@@ -10,6 +10,8 @@ fruitsPack = TexturePack.new("resources/fruits.txt", "resources/fruits.png")
 fruitsDesc = io.open("resources/fruits.txt", "rb"):read"*a"
 ringtile = Texture.new("resources/ringtile.png", true, {wrap = Texture.REPEAT})
 
+application:configureFrustum(90)
+
 local function getFontCache(charsets)
 	local t = {}
 	local n = 0

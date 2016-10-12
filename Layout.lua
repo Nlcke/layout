@@ -175,6 +175,9 @@ local default = {
 	centerX = 0.5, -- [0..1]
 	centerY = 0.5, -- [0..1]
 	
+	-- content clipping
+	clip = true,
+	
 	-- identification
 	id = false, -- to get child by id with 'layout(id)' call
 	
@@ -474,6 +477,7 @@ function Layout.new(p, d)
 	Mesh.setColorArray(self, c, a, c, a, c, a, c, a)
 	
 	self:addEventListener(Event.ENTER_FRAME, self.enterFrame, self)
+	--self:addEventListener(Event.ADDED_TO_STAGE, self.enterFrame, self)
 	
 	return self
 end
@@ -500,8 +504,8 @@ function Layout:enterFrame(e)
 		end
 	else
 		Sprite.removeFromParent(self)
-		self.parW = parent:getWidth()
-		self.parH = parent:getHeight()
+		self.parW = parent:getWidth(true)
+		self.parH = parent:getHeight(true)
 		parent:addChild(self)
 	end
 	
@@ -981,7 +985,7 @@ function Layout:update(p)
 	end
 	
 	local offX, offY = self.offX, self.offY
-	self:setClip(offX, offY, w, h)
+	if self.clip then self:setClip(offX, offY, w, h) end
 	
 	local x = self.col and (self.parCellW + self.parCellBrdW) * self.col or self.absX or
 		(self.relX and self.relX * self.parW or self.ancX * (self.parW - w))
@@ -1071,7 +1075,7 @@ function Layout:updateScroll(dx, dy)
 		self.pointerAY = 0
 	end
 	
-	self:setClip(offX, offY, self.w, self.h)
+	if self.clip then self:setClip(offX, offY, self.w, self.h) end
 	local x, y = self:getPosition()
 	self:setPosition(x + dx, y + dy)
 	self.backup.x = self.backup.x + (dx / self.w)
@@ -1192,6 +1196,8 @@ function Layout:updateSprite(sprite)
 
 	sprite:setPosition(0, 0)
 	sprite:setScale(1.0)
+	sprite:setAnchorPosition(0, 0)
+	if sprite.setAnchorPoint then sprite:setAnchorPoint(0, 0) end
 	
 	local w = sprite:getWidth()
 	local h = sprite.getLineHeight and sprite:getLineHeight() or sprite:getHeight()
@@ -1337,11 +1343,26 @@ function Layout:animate(t)
 		end
 		self:update(p)
 	end
+	
 	t = self.strength * t
 	local anim, bak = self.anim, self.backup
 	local x, y, ax, ay = anim.x, anim.y, anim.anchorX, anim.anchorY
-	local r = anim.rotation
-	anim.x, anim.y, anim.anchorX, anim.anchorY, anim.rotation = nil
+	anim.x, anim.y, anim.anchorX, anim.anchorY = nil
+	local rx, ry, rz = anim.rotationX, anim.rotationY, anim.rotation
+	anim.rotationX, anim.rotationY, anim.rotation = nil
+	
+	if rx then
+		self:setRotationX(bak.rotationX +
+			360 * t * (tonumber(rx) and rx or rx(t)))
+	end
+	if ry then
+		self:setRotationY(bak.rotationY +
+			360 * t * (tonumber(ry) and ry or ry(t)))
+	end
+	if rz then
+		self:setRotation(bak.rotation +
+			360 * t * (tonumber(rz) and rz or rz(t)))
+	end
 	
 	for k,v in pairs(anim) do
 		self:set(k, bak[k] + t * (tonumber(v) and v or v(t)))
@@ -1365,13 +1386,8 @@ function Layout:animate(t)
 		self:setAnchorPosition(x, y)
 	end
 	
-	if r then
-		self:setRotation(bak.rotation +
-			360 * t * (tonumber(r) and r or r(t)))
-	end
-	
 	anim.x, anim.y, anim.anchorX, anim.anchorY = x, y, ax, ay
-	anim.rotation = r
+	anim.rotationX, anim.rotationY, anim.rotation = rx, ry, rz
 end
 
 function Layout:backupState(anim)
@@ -1777,6 +1793,7 @@ function Layout.newAnimation(frames, mark, strength, seed)
 		strength        = strength or 1,
 		x               = math.random(-1, 1),
 		y               = math.random(-1, 1),
+		z               = math.random(-1, 1),
 		anchorX         = math.random(-1, 1),
 		anchorY         = math.random(-1, 1),
 		rotation        = math.random(-1, 1),
