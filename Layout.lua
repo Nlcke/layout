@@ -482,7 +482,7 @@ function Layout.new(p, d)
 	return self
 end
 
-function Layout:enterFrame(e)	
+function Layout:enterFrame(e)
 	if not self.__parent then return end
 	
 	local parent = self.__parent
@@ -918,8 +918,8 @@ function Layout:update(p)
 		if p.ancX then self.offX = self.scrW * self.ancX end
 		if p.ancY then self.offY = self.scrH * self.ancY end
 		if p.offX or p.offY then
-			if p.offX then self.ancX = p.offX / self.scrW end
-			if p.offY then self.ancY = p.offY / self.scrH end
+			if p.offX and self.scrW > 0 then self.ancX = p.offX / self.scrW end
+			if p.offY and self.scrH > 0 then self.ancY = p.offY / self.scrH end
 			if self.onScroll then self:onScroll() end
 		end
 		for k,v in pairs(p) do
@@ -1765,10 +1765,9 @@ function Layout.onKeyOrButton(code)
 				elseif sy2 > y2 then
 					t.offY = math.min(sy2 - parent.h, parent.scrH)
 				end
-				for k,v in pairs(t) do
+				if t.offX or t.offY then
 					local a = {frames = parent.scrollFrames, mark = -1}
 					parent:play(a, t)
-					break
 				end
 			end
 			selected.event = Layout.IDLE
