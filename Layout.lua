@@ -915,13 +915,6 @@ function Layout:update(p)
 				end
 			end
 		end
-		if p.ancX then self.offX = self.scrW * self.ancX end
-		if p.ancY then self.offY = self.scrH * self.ancY end
-		if p.offX or p.offY then
-			if p.offX and self.scrW > 0 then self.ancX = p.offX / self.scrW end
-			if p.offY and self.scrH > 0 then self.ancY = p.offY / self.scrH end
-			if self.onScroll then self:onScroll() end
-		end
 		for k,v in pairs(p) do
 			if tonumber(k) then
 				self:addChild(self.ext and self:ext(v) or v) 
@@ -930,6 +923,7 @@ function Layout:update(p)
 			end
 		end
 		self:updateColor(p.texC, p.texA, p.bgrC, p.bgrA)
+		if self.onScroll and (p.offX or p.offY) then self:onScroll() end
 	end
 	
 	local w = self.col and self.parCellW * self.cellW or self.absW or
@@ -955,14 +949,10 @@ function Layout:update(p)
 				self.scrH = math.max(0, self.conH - self.h)
 				if p.selectedCol then
 					self.offX = math.min(cw * self.selectedCol, self.scrW)
-					self.ancX = self.offX / self.scrW
 				end
 				if p.selectedRow then
 					self.offY = math.min(ch * self.selectedRow, self.scrH)
-					self.ancY = self.offY / self.scrH
 				end
-				if self.ancX ~= self.ancX then self.ancX = 0 end
-				if self.ancY ~= self.ancY then self.ancY = 0 end
 				if self.onScroll then self:onScroll() end
 			end
 		else
@@ -1086,9 +1076,6 @@ function Layout:updateScroll(dx, dy)
 	end
 	
 	self.offX, self.offY = offX, offY
-	self.ancX, self.ancY = offX / self.scrW, offY / self.scrH
-	if self.ancX ~= self.ancX then self.ancX = 0 end
-	if self.ancY ~= self.ancY then self.ancY = 0 end
 	
 	if self.template and self.__children then
 		for _, child in pairs(self.__children) do
@@ -1642,13 +1629,13 @@ stage:addEventListener(Event.MOUSE_WHEEL, function(e)
 	local selected = Layout.selected
 	local keys = selected.isLayout and selected.keys or Layout.keys
 	local parent = selected.__parent
-	if keys.mouseWheel and parent and parent.template then	
+	if keys.mouseWheel and parent and parent.template then
 		local off = parent.offY + (selected.parCellH + selected.parCellBrdH) *
 			(e.wheel < 0 and 1 or -1)
 		if off < 0 then off = 0
 		elseif off > parent.scrH then off = parent.scrH end
 		if off == parent.offY then return end
-		parent:update{offY = off, ancY = off / parent.scrH}
+		parent:update{offY = off}
 		if parent.onScroll then parent:onScroll() end
 	elseif keys.mouseWheel then
 		Layout.onKeyOrButton(e.wheel > 0 and "UP" or "DOWN")

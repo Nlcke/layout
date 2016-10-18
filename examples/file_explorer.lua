@@ -85,7 +85,10 @@ local Button = Layout:with{
 		panel1:removeFromParent()
 		layout:addChild(panel2)
 		panel2:update{database = database, selectedRow = levels[#levels]}
-		slider"handle":update{ancY = panel2.ancY, relH = panel2.h / panel2.conH}
+		slider"handle":update{
+			ancY = panel2.offY / panel2.scrH,
+			relH = panel2.h / panel2.conH
+		}
 		slider:play{frames = 60, mark = 0, x = 1, alpha = -1}
 		Layout.select(panel2)
 		
@@ -117,9 +120,11 @@ local Panel = Layout:with{
 	cellBrdH = 5,
 	cols = 1,
 	relW = 1 - sliderWidth, relX = 0,
-	onScroll = function(self) slider"handle":update{ancY = self.ancY} end,
+	onScroll = function(self)
+		slider"handle":update{ancY = self.offY / self.scrH}
+	end,
 	onResize = function(self)
-		slider"handle":update{relH = self.h / self.conH, ancX = self.ancX}
+		slider"handle":update{relH = self.h / self.conH}
 	end
 }
 
@@ -136,7 +141,9 @@ slider = Layout.new{
 		relW = 1.00, relH = 0.05,
 		bgrC = 0x00BBFF, bgrA = 1.0,
 		move = true,
-		onMove = function(self) panel1:update{ancY = self.ancY} end,
+		onMove = function(self)
+			panel1:update{offY = panel1.scrH * self.ancY}
+		end,
 	}
 }
 
