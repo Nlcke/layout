@@ -446,7 +446,7 @@ Animation should be a table and only the following special and standard keys are
   * `0..` for three-phase animation from initial state to new state and to initial state. If it is greater or equal to `1` then this number will be used as a mark at which animation will be reverted back. If it is between `0` and `1` then it will be multiplied on the number of `frames` first.
 * `strength` is optional key which defines multiplier for time parameter (range of time is [0..1]) to change animation range. Equal to `1` if not defined.
 
-#### <a name = "standard-keys">Standard keys:
+#### <a name = "standard-keys">Standard keys</a>
 * `x`
 * `y`
 * `anchorX`
@@ -461,8 +461,10 @@ Animation should be a table and only the following special and standard keys are
 * `greenMultiplier`
 * `blueMultiplier`
 * `alphaMultiplier`
+* `skewX`
+* `skewY`
 
-They are standard because they are the same as for `Sprite.set` method. However they are not absolute as for Sprite. They are relative to _initial_ state of layout and some of them changed to better fit in `[0..1]` relative time range. For each of them `0` value means no change. For `x`, `y`, `anchorX`, `anchorY` values will be multiplied to width and height of animated layout and `rotation` will be multiplied by 360 degrees.
+They are standard because they are the same as for `Sprite.set` method. However they are not absolute as for Sprite. They are relative to _initial_ state of layout and some of them changed to better fit in `[0..1]` relative time range. For each of them `0` value means no change. For `x`, `y`, `anchorX`, `anchorY` values will be multiplied to width and height of animated layout. For `rotationX`, `rotationY` and `rotation` values will be multiplied by 360 degrees. For `skewX` and `skewY` values will be multiplied by 90 degrees.
 
 Each standard key is optional and can be either `number` or `function`.
 

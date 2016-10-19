@@ -78,8 +78,10 @@ function must return a number (delta) based on that parameter t
 result of function will be multiplied by t and added to original value
 -- x, y, anchorX, anchorY --
 this parameters are relative to width and height of the layout
--- rotation --
-rotation will be multiplied by 360 (1.0 = 360, -0.5 = -180, etc)
+-- rotationX, rotationY, rotation --
+each rotation will be multiplied by 360 (1.0 = 360, -0.5 = -180, etc)
+-- skewX, skewY --
+each skew will be multiplied by 90 (1.0 = 90, -0.5 = -45, etc)
 --]]------------------------------------------------------------------------
 
 Layout = Core.class(Mesh)
@@ -1337,6 +1339,8 @@ function Layout:animate(t)
 	anim.x, anim.y, anim.anchorX, anim.anchorY = nil
 	local rx, ry, rz = anim.rotationX, anim.rotationY, anim.rotation
 	anim.rotationX, anim.rotationY, anim.rotation = nil
+	local kx, ky = anim.skewX, anim.skewY
+	anim.skewX, anim.skewY = nil
 	
 	if rx then
 		self:setRotationX(bak.rotationX +
@@ -1350,6 +1354,13 @@ function Layout:animate(t)
 		self:setRotation(bak.rotation +
 			360 * t * (tonumber(rz) and rz or rz(t)))
 	end
+	
+	if kx then
+		self:setSkewX(bak.skewX + 90 * t * (tonumber(kx) and kx or kx(t)))
+	end
+	if ky then
+		self:setSkewY(bak.skewY + 90 * t * (tonumber(ky) and ky or ky(t)))
+	end	
 	
 	for k,v in pairs(anim) do
 		self:set(k, bak[k] + t * (tonumber(v) and v or v(t)))
@@ -1375,6 +1386,7 @@ function Layout:animate(t)
 	
 	anim.x, anim.y, anim.anchorX, anim.anchorY = x, y, ax, ay
 	anim.rotationX, anim.rotationY, anim.rotation = rx, ry, rz
+	anim.skewX, anim.skewY = kx, ky
 end
 
 function Layout:backupState(anim)
@@ -1787,6 +1799,8 @@ function Layout.newAnimation(frames, mark, strength, seed)
 		rotationY       = math.random(-1, 1),
 		scaleX          = math.random(-1, 1),
 		scaleY          = math.random(-1, 1),
+		skewX           = math.random(-1, 1),
+		skewY           = math.random(-1, 1),
 		alpha           = math.random(-1, 0),
 		redMultiplier   = math.random(-1, 0),
 		greenMultiplier = math.random(-1, 0),
