@@ -367,10 +367,10 @@ moveDelta     =   1, -- area side to detect moving/scrolling, [0..]
 scrollFrames = 20, -- animation frames for keyboard or joystick scroll
 
 -- scaling
-scaleMouseResp = 0.005, -- scale response for mouse
-scaleTouchResp = 0.005, -- scale response for touch
-scaleMin       =   0.2, -- scale minimal value
-scaleMax       =   2.0, -- scale maximal value
+zoomMouseResp = 0.005, -- scale response for mouse
+zoomTouchResp = 0.005, -- scale response for touch
+zoomMin       =   0.2, -- scale minimal value
+zoomMax       =   2.0, -- scale maximal value
 
 -- tilting
 tiltMouseResp = 1, -- tilt response for mouse
@@ -388,18 +388,20 @@ onMove   = false, -- callback at layout moving, [false|function]
 onScroll = false, -- callback at layout scrolling, [false|function]
 onBack   = false, -- callback at "BACK" action, [false|function]
 onResize = false, -- callback at changing size, [false|function]
+onZoom   = false, -- callback at zooming, [false|function]
+onTilt   = false, -- callback at tilt, [false|function]
 
 -- built-in callbacks
 scroll = false, -- move children with mouse or touch, [false|true]
 move   = false, -- move layout with mouse or touch, [false|true]
-scale  = false, -- scale layout with RMB or double touch, [false|true]
-tilt   = false, -- tilt layout with RMB or double touch, [false|true]
+zoom   = false, -- zoom layout with RMB or 2-point touch, [false|true]
+tilt   = false, -- tilt layout with RMB or 2-point touch, [false|true]
 
 -- animation
 anAdd    = false, -- opening animation (mark=0)
 anRemove = false, -- ending animation (mark=-1)
 anPress  = false, -- press animation (mark>0)
-anHover  = false, -- hover animation (mark>0)
+anHover  = false, -- hover animation (mark>0) 
 ```
 
 ### <a name = "resource-loader-api">Resource Loader API</a>

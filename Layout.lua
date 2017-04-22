@@ -229,10 +229,10 @@ local default = {
 	scrollFrames = 20, -- animation frames for keyboard or joystick scroll
 	
 	-- scaling
-	scaleMouseResp = 0.005, -- scale response for mouse
-	scaleTouchResp = 0.005, -- scale response for touch
-	scaleMin       =   0.2, -- scale minimal value
-	scaleMax       =   2.0, -- scale maximal value
+	zoomMouseResp = 0.005, -- scale response for mouse
+	zoomTouchResp = 0.005, -- scale response for touch
+	zoomMin       =   0.2, -- scale minimal value
+	zoomMax       =   2.0, -- scale maximal value
 	
 	-- tilting
 	tiltMouseResp = 1, -- tilt response for mouse
@@ -250,12 +250,14 @@ local default = {
 	onScroll = false, -- callback at layout scrolling, [false|function]
 	onBack   = false, -- callback at "BACK" action, [false|function]
 	onResize = false, -- callback at changing size, [false|function]
+	onZoom   = false, -- callback at zooming, [false|function]
+	onTilt   = false, -- callback at tilt, [false|function]
 	
 	-- built-in callbacks
 	scroll = false, -- move children with mouse or touch, [false|true]
 	move   = false, -- move layout with mouse or touch, [false|true]
-	scale  = false, -- scale layout with RMB or double touch, [false|true]
-	tilt   = false, -- tilt layout with RMB or double touch, [false|true]
+	zoom   = false, -- zoom layout with RMB or 2-point touch, [false|true]
+	tilt   = false, -- tilt layout with RMB or 2-point touch, [false|true]
 	
 	-- animation
 	anAdd    = false, -- opening animation (mark=0)
@@ -285,7 +287,7 @@ local internal = {
 	HOVER       = 1,
 	PRESS_HOLD  = 2,
 	MOVE_SCROLL = 3,
-	SCALE_TILT  = 4,
+	ZOOM_TILT   = 4,
 	ADD         = 5,
 	REMOVE      = 6,
 	PLAY        = 7,
@@ -334,6 +336,8 @@ local internal = {
 	oldstate = false,
 
 	-- scroll and move parameters
+	pointerX0 = 0, -- initial X of pointer
+	pointerY0 = 0, -- initial Y of pointer
 	pointerX  = 0, -- current X of pointer
 	pointerY  = 0, -- current Y of pointer
 	pointerDX = 0, -- delta X value
@@ -377,7 +381,7 @@ local internal = {
 	-- event processing functions
 	atHover = false,
 	atPress = false,
-	atScaleOrTilt = false,
+	atZoomOrTilt = false,
 	onKeyOrButton = false,
 	onMouseDown = false,
 	onMouseHover = false,
@@ -398,6 +402,7 @@ local internal = {
 	updateSprite = false,
 	updateTemplateGrid = false,
 	updateTexture = false,
+	updateZoom = false,
 }
 
 for k,v in pairs(internal) do Layout[k] = v end
@@ -506,8 +511,8 @@ function Layout:enterFrame(e)
 		end
 	else
 		Sprite.removeFromParent(self)
-		self.parW = parent:getWidth(true)
-		self.parH = parent:getHeight(true)
+		local _
+		_, _, self.parW, self.parH = parent:getBounds(parent)
 		parent:addChild(self)
 	end
 	
@@ -554,7 +559,7 @@ function Layout:enterFrame(e)
 		end
 	end
 	
-	if self.scroll or self.move or self.scale or self.tilt then
+	if self.scroll or self.move or self.zoom or self.tilt then
 		if self.event == Layout.MOVE_SCROLL then
 			local f = self.moveFriction
 			self.pointerAX = f * (self.pointerAX + self.pointerDX)
@@ -576,24 +581,33 @@ function Layout:enterFrame(e)
 				self.pointerY = self.pointerY + self.pointerDY
 				self.pointerDX, self.pointerDY = 0, 0
 			end
-		elseif self.event == Layout.SCALE_TILT then
+		elseif self.event == Layout.ZOOM_TILT then
 			if self.pointerDX ~= 0 or self.pointerDY ~= 0 then
-				if self.scale then
-					local minS, maxS = self.scaleMin, self.scaleMax
-					local k = self.isMouseMove and -self.scaleMouseResp
-						or self.scaleTouchResp
-					local s = self:getScale() + k * self.pointerDY
-					if s < minS then s = minS
-					elseif s > maxS then s = maxS end
-					self:setScale(s)
-					self.backup.scaleX, self.backup.scaleY = s, s
+				if self.zoom then
+					if self.scroll then
+						local k = self.isMouseMove and -self.zoomMouseResp
+							or self.zoomTouchResp
+						self:updateScroll(0, 0, k * self.pointerDY)
+					else
+						local minS, maxS = self.zoomMin, self.zoomMax
+						local k = self.isMouseMove and -self.zoomMouseResp
+							or self.zoomTouchResp
+						local s = self:getScale() + k * self.pointerDY
+						if s < minS then s = minS
+						elseif s > maxS then s = maxS end
+						self:setScale(s)
+						self.backup.scaleX, self.backup.scaleY = s, s
+					end
 				end
 				if self.tilt then
 					local k = self.isMouseMove and self.tiltMouseResp
 						or -57.3 * self.tiltTouchResp
-					local r = self:getRotation() + k * self.pointerDX
-					self:setRotation(r)
-					self.backup.rotation = r
+					if self.scroll then
+					else
+						local r = self:getRotation() + k * self.pointerDX
+						self:setRotation(r)
+						self.backup.rotation = r
+					end
 				end
 				self.pointerX = self.pointerX + self.pointerDX
 				self.pointerY = self.pointerY + self.pointerDY
@@ -651,7 +665,7 @@ end
 
 function Layout:enableEvents()
 	local hoverEvents = self.anHover or self.onHover
-	local moveEvents = self.scroll or self.move or self.scale or self.tilt
+	local moveEvents = self.scroll or self.move or self.zoom or self.tilt
 	local pressEvents = self.onPress or self.onHold or self.anPress
 	if hoverEvents then
 		self:addEventListener(Event.MOUSE_HOVER, self.onMouseHover, self)
@@ -687,7 +701,7 @@ function Layout:hitTestPoint(x, y)
 		if not parent:hitTestPoint(x, y) then return false end
 	end
 	
-	if self.scale or self.tilt then
+	if (self.zoom or self.tilt) and not self.scroll then
 		local r = Sprite.getRotation(self)
 		local s = Sprite.getScale(self)
 		local lx, ly = Sprite.globalToLocal(self, x, y)
@@ -698,8 +712,10 @@ function Layout:hitTestPoint(x, y)
 		Sprite.setScale(self, s)
 	end
 	
-	local x0, y0 = Sprite.localToGlobal(parent, self.x, self.y)
-	return x >= x0 and y >= y0 and x <= x0 + self.w and y <= y0 + self.h
+	local ltg = Sprite.localToGlobal
+	local x1, y1 = ltg(parent, self.x, self.y)
+	local x2, y2 = ltg(parent, self.x + self.w, self.y + self.h)
+	return x >= x1 and y >= y1 and x <= x2 and y <= y2
 end
 
 function Layout:bringToFront()
@@ -741,12 +757,13 @@ end
 function Layout:onMouseDown(e)
 	if e.button == 1 or e.button == 2 then
 		self.pointerX, self.pointerY = e.x, e.y
+		self.pointerX0, self.pointerY0 = self.pointerX, self.pointerY
 		self.pointerDX, self.pointerDY = 0, 0
 		if self:hitTestPoint(e.x, e.y) then
 			if e.button == 1 then
 				self:atPress()
 			else
-				self:atScaleOrTilt()
+				self:atZoomOrTilt()
 				self.isMouseMove = true
 			end
 			e:stopPropagation()
@@ -757,6 +774,7 @@ end
 function Layout:onTouchesBegin(e)
 	if #e.allTouches == 1 then
 		self.pointerX, self.pointerY = e.touch.x, e.touch.y
+		self.pointerX0, self.pointerY0 = self.pointerX, self.pointerY
 		self.pointerDX, self.pointerDY = 0, 0
 		if self:hitTestPoint(e.touch.x, e.touch.y) then
 			self:atPress()
@@ -764,11 +782,11 @@ function Layout:onTouchesBegin(e)
 		end
 	elseif #e.allTouches == 2 then
 		local t1, t2 = e.allTouches[1], e.allTouches[2]
-		local x, y = (t1.x + t2.x) / 2, (t1.y + t2.y) / 2
-		if self:hitTestPoint(x, y) then
-			self.pointerY = math.sqrt((t1.x - t2.x)^2 + (t1.y - t2.y)^2)
+		self.pointerX0, self.pointerY0 = (t1.x + t2.x) / 2, (t1.y + t2.y) / 2
+		if self:hitTestPoint(self.pointerX0, self.pointerY0) then
 			self.pointerX = math.atan2(t1.x - t2.x, t1.y - t2.y)
-			self:atScaleOrTilt()
+			self.pointerY = math.sqrt((t1.x - t2.x)^2 + (t1.y - t2.y)^2)
+			self:atZoomOrTilt()
 			self.isMouseMove = false
 			e:stopPropagation()
 		end
@@ -795,14 +813,14 @@ function Layout:atPress()
 	end
 end
 
-function Layout:atScaleOrTilt(e)
+function Layout:atZoomOrTilt(e)
 	self:bringToFront()
 	self.pointerAX, self.pointerAY = 0, 0
 	if self.frame < self.frames then
 		self.frame = self.frames
 		self:restoreState()
 	end
-	self.event = Layout.SCALE_TILT
+	self.event = Layout.ZOOM_TILT
 end
 
 function Layout:onMouseMove(e)
@@ -828,7 +846,7 @@ function Layout:onTouchesMove(e)
 			if self.frame < self.mark then self:continueAnimation() end
 			self.event = Layout.MOVE_SCROLL
 		end	
-	elseif self.event == Layout.SCALE_TILT then
+	elseif self.event == Layout.ZOOM_TILT then
 		local t1, t2 = e.allTouches[1], e.allTouches[2]
 		self.pointerDY = math.sqrt((t1.x - t2.x)^2 + (t1.y - t2.y)^2) - self.pointerY
 		self.pointerDX = math.atan2(t1.x - t2.x, t1.y - t2.y) - self.pointerX
@@ -840,7 +858,7 @@ end
 local eventsToHover = {
 	[Layout.PRESS_HOLD] = true,
 	[Layout.MOVE_SCROLL] = true,
-	[Layout.SCALE_TILT] = true,
+	[Layout.ZOOM_TILT] = true,
 }
 
 function Layout:onRelease(e)
@@ -883,8 +901,8 @@ function Layout:update(p)
 				end
 			else
 				Sprite.removeFromParent(self)
-				self.parW = parent:getWidth()
-				self.parH = parent:getHeight()
+				local _
+				_, _, self.parW, self.parH = parent:getBounds(parent)
 				parent:addChild(self)
 			end
 		end
@@ -937,46 +955,47 @@ function Layout:update(p)
 	if self.limH and h / w > self.limH then h = self.limH * w end
 	
 	if w ~= self.w or h ~= self.h then
-		--Mesh.setVertices(self, 1,0,0, 2,w,0, 3,w,h, 4,0,h)
 		Mesh.setVertices(self, 1,-1,-1, 2,w+1,-1, 3,w+1,h+1, 4,-1,h+1)
-		self.w, self.h = w, h
+		
+		local min, max = math.min, math.max
 		if self.template then
 			local cols, rows = self:getGridSize()
-			local cw = (self.cellAbsW or self.cellRelW * self.w) + self.cellBrdW
-			local ch = (self.cellAbsH or self.cellRelH * self.h) + self.cellBrdH
+			local cw = (self.cellAbsW or self.cellRelW * w) + self.cellBrdW
+			local ch = (self.cellAbsH or self.cellRelH * h) + self.cellBrdH
 			self.conW = cw * cols - self.cellBrdW
 			self.conH = ch * rows - self.cellBrdH
 			if p and (p.selectedCol or p.selectedRow) then
-				self.scrW = math.max(0, self.conW - self.w)
-				self.scrH = math.max(0, self.conH - self.h)
+				self.scrW = max(0, self.conW - w)
+				self.scrH = max(0, self.conH - h)
 				if p.selectedCol then
-					self.offX = math.min(cw * self.selectedCol, self.scrW)
+					self.offX = min(cw * self.selectedCol, self.scrW)
 				end
 				if p.selectedRow then
-					self.offY = math.min(ch * self.selectedRow, self.scrH)
+					self.offY = min(ch * self.selectedRow, self.scrH)
 				end
 				if self.onScroll then self:onScroll() end
 			end
 		else
 			if self.cols > 0 then
-				self.conW = (self.cellAbsW or self.cellRelW * self.w) * self.cols
+				self.conW = (self.cellAbsW or self.cellRelW * w) * self.cols
 			else
-				self.conW = self.conAbsW or self.conRelW * self.w
+				self.conW = self.conAbsW or self.conRelW * w
 			end
 			if self.rows > 0 then
-				self.conH = (self.cellAbsH or self.cellRelH * self.h) * self.rows
+				self.conH = (self.cellAbsH or self.cellRelH * h) * self.rows
 			else
-				self.conH = self.conAbsH or self.conRelH * self.h
+				self.conH = self.conAbsH or self.conRelH * h
 			end
 		end
-		self.scrW = math.max(0, self.conW - self.w)
-		self.scrH = math.max(0, self.conH - self.h)
-		self.offX = math.min(self.offX, self.scrW)
-		self.offY = math.min(self.offY, self.scrH)
+		self.scrW = max(0, self.conW * self:getScaleX() - w)
+		self.scrH = max(0, self.conH * self:getScaleY() - h)
+		self.offX = min(self.offX, self.scrW)
+		self.offY = min(self.offY, self.scrH)
 		if self.onResize then self:onResize() end
 	end
 	
 	local offX, offY = self.offX, self.offY
+	
 	if self.clip then self:setClip(offX, offY, w, h) end
 	
 	local x = self.col and (self.parCellW + self.parCellBrdW) * self.col or self.absX or
@@ -997,14 +1016,29 @@ function Layout:update(p)
 		local p = self.__parent
 		if p then Layout.selector:setPosition(p.offX + ax, p.offY + ay) end
 	end
+
+	if self.zoom then
+		local w0, h0 = self.w, self.h
+		self.w, self.h = w, h
+		local dz = (math.max(self:getScale()) - 1) * math.max(w / self.w, h / self.h)
+		self:setScale(1)
+		local px, py = self.pointerX0, self.pointerY0
+		self.pointerX0, self.pointerY0 = self:localToGlobal(0, 0)
+		self:updateScroll(ax * dz, ay * dz, dz)
+		self.pointerX0, self.pointerY0 = px, py
+	end
+
+	self.w, self.h = w, h
 	
 	if self.texture then self:updateTexture(self.texture) end
 	
 	if self.template then return self:updateTemplateGrid() end
-	
-	if self.__children then
-		for _,child in pairs(self.__children) do
-			if not child.isLayout then self:updateSprite(child) end
+
+	if self.__children and self.sprM ~= Layout.NO_SCALE then
+		for _,sprite in pairs(self.__children) do
+			if sprite.isLayout then
+			elseif sprite.onResize then sprite:onResize(self.w, self.h)
+			else self:updateSprite(sprite) end
 		end
 	end
 end
@@ -1043,8 +1077,34 @@ function Layout:updateColor(texC, texA, bgrC, bgrA)
 	end
 end
 
-function Layout:updateScroll(dx, dy)
-	if dx == 0 and dy == 0 then return end
+function Layout:updateScroll(dx, dy, dz)
+	if dx == 0 and dy == 0 and not dz then return end
+	
+	if dz then
+		local x0, y0 = self:globalToLocal(self.pointerX0, self.pointerY0)
+		
+		local sx0, sy0 = self:getScale()
+		local sx, sy = sx0 * (1 + dz), sy0 * (1 + dz)
+		if sx < 1 then sx = 1 end
+		if sy < 1 then sy = 1 end
+		self:setScale(sx, sy)
+		local ax, ay = self:getAnchorPosition()
+		
+		dx, dy = ax * (sx - sx0), ay * (sy - sy0)
+		
+		local offX, offY = self.offX, self.offY
+		self.offX, self.offY = offX + dx, offY + dy
+		
+		local parent = self.__parent or stage
+		
+		dx, dy = dx - (sx - sx0) * x0, dy - (sy - sy0) * y0
+	end
+	
+	local sx, sy = self:getScale()
+	
+	self.scrW = math.max(0, self.conW * sx - self.w)
+	self.scrH = math.max(0, self.conH * sy - self.h)
+	
 	local offX, offY = self.offX - dx, self.offY - dy
 	
 	if offX < 0 then
@@ -1052,7 +1112,7 @@ function Layout:updateScroll(dx, dy)
 		offX = 0
 		self.pointerAX = 0
 	elseif offX > self.scrW then
-		dx = self.offX - self.scrW 
+		dx = self.offX - self.scrW
 		offX = self.scrW
 		self.pointerAX = 0
 	end
@@ -1067,7 +1127,8 @@ function Layout:updateScroll(dx, dy)
 		self.pointerAY = 0
 	end
 	
-	if self.clip then self:setClip(offX, offY, self.w, self.h) end
+	if self.clip then self:setClip(offX / sx, offY / sy, self.w / sx, self.h / sy) end
+	
 	local x, y = self:getPosition()
 	self:setPosition(x + dx, y + dy)
 	self.backup.x = self.backup.x + (dx / self.w)
@@ -1178,10 +1239,14 @@ function Layout:updateTexture(texture)
 end
 
 function Layout:updateSprite(sprite)
-	local pw, ph = self.w, self.h
-	if sprite.onResize then return sprite:onResize(pw, ph) end
 	local m = self.sprM
-	if m == Layout.NO_SCALE then return end
+	local pw, ph = self.w, self.h
+	
+	--[[
+	if sprite.onResize then return sprite:onResize(pw, ph) end
+	if self.zoom and self.scroll then return self:updateZoom(0, 0, -10000, 0) end
+	if self.scroll or m == Layout.NO_SCALE then return end
+	--]]
 
 	sprite:setPosition(0, 0)
 	sprite:setScale(1.0)
@@ -1286,7 +1351,7 @@ function Layout:updateTemplateGrid()
 		end
 	end
 	
-	if isSelected and self.__children then
+	if isSelected and self.__children and l > 0 then
 		local col, row = self.selectedCol, self.selectedRow
 		local n = self.colsFill and (col - col0) * urows + row - row0 + 1 or
 			(row - row0) * ucols + col - col0 + 1
@@ -1785,27 +1850,28 @@ function Layout.newAnimation(frames, mark, strength, seed)
 		seed = p.seed
 	end
 	if seed then math.randomseed(seed) end
+	local random = math.random
 	return {
 		frames          = frames or 60,
 		mark            = mark or 0.5,
 		strength        = strength or 1,
-		x               = math.random(-1, 1),
-		y               = math.random(-1, 1),
-		z               = math.random(-1, 1),
-		anchorX         = math.random(-1, 1),
-		anchorY         = math.random(-1, 1),
-		rotation        = math.random(-1, 1),
-		rotationX       = math.random(-1, 1),
-		rotationY       = math.random(-1, 1),
-		scaleX          = math.random(-1, 1),
-		scaleY          = math.random(-1, 1),
-		skewX           = math.random(-1, 1),
-		skewY           = math.random(-1, 1),
-		alpha           = math.random(-1, 0),
-		redMultiplier   = math.random(-1, 0),
-		greenMultiplier = math.random(-1, 0),
-		blueMultiplier  = math.random(-1, 0),
-		alphaMultiplier = math.random(-1, 0),
+		x               = random(-1, 1),
+		y               = random(-1, 1),
+		z               = random(-1, 1),
+		anchorX         = random(-1, 1),
+		anchorY         = random(-1, 1),
+		rotation        = random(-1, 1),
+		rotationX       = random(-1, 1),
+		rotationY       = random(-1, 1),
+		scaleX          = random(-1, 1),
+		scaleY          = random(-1, 1),
+		skewX           = random(-1, 1),
+		skewY           = random(-1, 1),
+		alpha           = random(-1, 0),
+		redMultiplier   = random(-1, 0),
+		greenMultiplier = random(-1, 0),
+		blueMultiplier  = random(-1, 0),
+		alphaMultiplier = random(-1, 0),
 	}
 end
 

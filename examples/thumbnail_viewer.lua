@@ -26,8 +26,8 @@ for col = 0, side do
 	for row = 0, side do
 		layout:addChild(Layout.new{
 			anAdd = Layout.newAnimation(),
-			move = true, scale = true, tilt = true,
-			scaleMin = 0.5, scaleMax = 10,
+			move = true, zoom = true, tilt = true,
+			zoomMin = 0.5, zoomMax = 10,
 			bgrC = math.random(0, 0xFFFFFF), bgrA = 1.0,
 			col = col, row = row,
 			texture = textures[col + row * side + 1]

@@ -1,8 +1,8 @@
 imagepath = "images" -- set this path to your image folder
-backbuttonTexture = Texture.new("resources/backbutton.png")
-leftbuttonTexture = Texture.new("resources/leftbutton.png")
-rightbuttonTexture = Texture.new("resources/rightbutton.png")
-skyworldTexture = Texture.new("resources/skyworld.png")
+backbuttonTexture = Texture.new("resources/backbutton.png", true)
+leftbuttonTexture = Texture.new("resources/leftbutton.png", true)
+rightbuttonTexture = Texture.new("resources/rightbutton.png", true)
+skyworldTexture = Texture.new("resources/skyworld.png", true)
 splashscreenPack = TexturePack.new("resources/splashscreen.txt",
 	"resources/splashscreen.png")
 splashscreenDesc = io.open("resources/splashscreen.txt", "rb"):read"*a"
